@@ -3,15 +3,9 @@
                               protect.c
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include "type.h"
-#include "const.h"
-#include "protect.h"
-#include "proc.h"
-#include "string.h"
-#include "tty.h"
-#include "console.h"
-#include "global.h"
-#include "proto.h"
+#include "head_unit.h"
+
+// #include "string.h"
 
 /* 本文件内函数声明 */
 PRIVATE void init_idt_desc(unsigned char vector, u8 desc_type,

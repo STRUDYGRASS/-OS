@@ -7,15 +7,7 @@
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 
-#include "type.h"
-#include "const.h"
-#include "protect.h"
-#include "tty.h"
-#include "console.h"
-#include "proc.h"
-#include "global.h"
-#include "proto.h"
-
+#include "head_unit.h"
 
 /*======================================================================*
                             init_8259A

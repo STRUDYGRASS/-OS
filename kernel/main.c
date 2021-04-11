@@ -4,19 +4,12 @@
  * @Autor: Yunfei
  * @Date: 2021-03-21 16:56:36
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-11 17:17:29
+ * @LastEditTime: 2021-04-11 20:28:28
  */
 
-#include "type.h"
-#include "const.h"
-#include "protect.h"
-#include "string.h"
-#include "proc.h"
-#include "tty.h"
-#include "console.h"
-#include "global.h"
-#include "proto.h"
+#include "head_unit.h"
 
+// #include "string.h"
 
 PUBLIC int kernel_main(){
     disp_str("-----\"kernel_main\" begins-----\n");

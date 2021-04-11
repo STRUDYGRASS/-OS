@@ -4,20 +4,12 @@
  * @Autor: Yunfei
  * @Date: 2021-04-11 15:55:08
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-11 16:54:35
+ * @LastEditTime: 2021-04-11 19:02:16
  */
 
+#include "head_unit.h"
 
-#include "type.h"
-#include "const.h"
-#include "protect.h"
-#include "string.h"
-#include "proc.h"
-#include "tty.h"
-#include "console.h"
-#include "global.h"
 #include "keyboard.h"
-#include "proto.h"
 
 PRIVATE void set_cursor(unsigned int position);
 PRIVATE void set_video_start_addr(u32 addr);

@@ -4,19 +4,11 @@
  * @Autor: Yunfei
  * @Date: 2021-03-26 16:14:17
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-11 17:19:14
+ * @LastEditTime: 2021-04-11 19:04:37
  */
 
 
-#include "type.h"
-#include "const.h"
-#include "protect.h"
-#include "string.h"
-#include "proc.h"
-#include "console.h"
-#include "tty.h"
-#include "global.h"
-#include "proto.h"
+#include "head_unit.h"
 
 #include "keyboard.h"
 #include "keymap.h"

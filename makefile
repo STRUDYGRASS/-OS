@@ -13,7 +13,8 @@ CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I boot/include/
 ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -fno-builtin -m32  -fno-stack-protector
+CFLAGS		= -I include/ -c -fno-builtin -m32  -fno-stack-protector -Wno-implicit-function-declaration
+#忽略标准库冲突函数，强制不进行栈检查，忽略函数定义未找到警告（asm中）
 LDFLAGS		= -s -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
@@ -28,6 +29,9 @@ OBJS = kernel/kernel.o kernel/start.o kernel/main.o \
 DASMOUTPUT = kernel.bin.asm
 
 # 关于C的借助gcc和.d文件的自动寻找依赖可以实现，然而最后还是希望能够手打依赖——因为目前所涉及的项目还是不算巨大，可以加深映像;具体的实现在隔壁
+# 另外，将global所涉及的头文件单入一头文件，那么make中的对应文件也可以用一个变量来表示，但是这个make也是起到了一个前期架构展示的作用，后面也不需要加这些东西了，就放着不动了吧
+# 严格来说，作者并未按照后面的更新会对global。h造成影响这样更新依赖 × 怪不得不在意啊，后面的架构都要重写233
+# 可能后面通信过后，我这前面的就得废掉了吧
 
 # ALL Phony Targets
 .PHONY: everything final image clean realclean disasm all buildimg
@@ -73,12 +77,14 @@ $(OSKERNEL) : $(OBJS)
 kernel/kernel.o : kernel/kernel.asm include/sconst.inc
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
-kernel/start.o : kernel/start.c include/const.h include/protect.h include/type.h include/global.h include/string.h\
-				include/proto.h include/proc.h
+kernel/start.o : kernel/start.c include/const.h include/protect.h include/type.h include/global.h \
+				include/proto.h include/proc.h \
+				# include/string.h
 	$(CC)  $(CFLAGS) -o $@ $<
 
-kernel/main.o: kernel/main.c include/type.h include/const.h include/protect.h include/string.h include/proc.h include/proto.h \
-			include/global.h
+kernel/main.o: kernel/main.c include/type.h include/const.h include/protect.h  include/proc.h include/proto.h \
+			include/global.h \
+			# include/string.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 
@@ -110,9 +116,11 @@ kernel/console.o : kernel/console.c
 	$(CC)  $(CFLAGS) -o $@ $<
 
 # Library
-lib/klib.o : lib/klib.c include/type.h include/const.h include/protect.h \
-		 include/proto.h include/string.h include/global.h
+# lib/klib.o : lib/klib.c include/type.h include/const.h include/protect.h \
+# 		 include/proto.h include/string.h include/global.h
+lib/klib.o : lib/klib.c include/const.h
 	$(CC)  $(CFLAGS) -o $@ $<
+# 这个地方就已经将string.h的声明包含进去了，然后上面就是o文件的直接链接
 
 lib/string.o : lib/string.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<

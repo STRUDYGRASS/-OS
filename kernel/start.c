@@ -4,20 +4,12 @@
  * @Autor: Yunfei
  * @Date: 2021-03-19 15:48:59
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-11 17:16:17
+ * @LastEditTime: 2021-04-11 20:28:35
  */
 
-#include "type.h"
-#include "const.h"
-#include "protect.h"
-#include "tty.h"
-#include "console.h"
-#include "string.h"
-#include "proc.h"
-#include "global.h"
-#include "proto.h"
+#include "head_unit.h"
 
-
+// #include "string.h"
 /*======================================================================*
                             cstart
  *======================================================================*/

@@ -5,14 +5,7 @@
 
 #define GLOBAL_VARIABLES_HERE
 
-#include "type.h"
-#include "const.h"
-#include "protect.h"
-#include "proc.h"
-#include "tty.h"
-#include "console.h"
-#include "global.h" //此时EXTERN = null，即此处为定义
-#include "proto.h"
+#include "head_unit.h"
 
 PUBLIC	PROCESS			proc_table[NR_TASKS];
 
