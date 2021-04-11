@@ -1,0 +1,10 @@
+.vscode/
+
+# shell and image
+*.img
+*.sh
+bochsrc
+
+# midlle product
+*.bin
+*.o
