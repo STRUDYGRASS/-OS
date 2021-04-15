@@ -4,7 +4,7 @@
  * @Autor: Yunfei
  * @Date: 2021-03-21 16:56:36
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-15 16:53:35
+ * @LastEditTime: 2021-04-15 21:20:55
  */
 
 #include "head_unit.h"
@@ -63,11 +63,17 @@ PUBLIC int kernel_main(){
 		p_proc++;
 		p_task++;
 		selector_ldt += 1 << 3;
+
+		p_proc->nr_tty = 0;
 	}
 
     k_reenter = 0;
 
 	p_proc_ready	= proc_table; 
+
+	proc_table[1].nr_tty = 0;
+	proc_table[2].nr_tty = 1;
+	proc_table[3].nr_tty = 1;
 
 	init_clock();
 	init_keyboard();
@@ -85,7 +91,8 @@ void TestA()
 	while(1){
 		// disp_str("A");
 		// disp_str(".");
-		delay(1);
+		printf("A:%x",20);
+		delay(100);
 	}
 }
 
@@ -97,6 +104,7 @@ void TestB()
 	while(1){
 		// disp_str("B");
 		// disp_str(".");
+		// printf("B");
 		delay(1);
 	}
 }

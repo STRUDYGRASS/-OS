@@ -24,6 +24,7 @@ OSKERNEL = kernel.bin
 OBJS = kernel/kernel.o kernel/start.o kernel/main.o \
 		kernel/clock.o kernel/syscall.o kernel/proc.o \
 		kernel/keyboard.o kernel/tty.o kernel/console.o \
+		kernel/printf.o kernel/vsprintf.o \
 		kernel/i8259.o kernel/global.o kernel/protect.o \
 		lib/kliba.o  lib/string.o lib/klib.o
 DASMOUTPUT = kernel.bin.asm
@@ -117,6 +118,12 @@ kernel/tty.o : kernel/tty.c
 
 kernel/console.o : kernel/console.c
 	$(CC)  $(CFLAGS) -o $@ $<
+
+kernel/printf.o: kernel/printf.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+kernel/vsprintf.o: kernel/vsprintf.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 # Library
 # lib/klib.o : lib/klib.c include/type.h include/const.h include/protect.h \

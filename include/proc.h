@@ -39,6 +39,8 @@ typedef struct s_proc {
 
 	u32 pid;                   /* process id passed in from MM */
 	char p_name[16];           /* name of the process */
+
+	int nr_tty;
 }PROCESS;
 
 typedef struct s_task {

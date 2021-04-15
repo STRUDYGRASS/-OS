@@ -11,6 +11,7 @@
 global	memcpy
 global	memset
 global  strcpy
+global  strlen
 
 
 ; ------------------------------------------------------------------------
@@ -45,6 +46,7 @@ memcpy:
 	pop	ecx
 	pop	edi
 	pop	esi
+
 	mov	esp, ebp
 	pop	ebp
 
@@ -114,3 +116,31 @@ strcpy:
 ; strcpy 结束-------------------------------------------------------------
 
 
+strlen:
+	push    ebp
+	mov     ebp, esp
+
+	push	esi
+	push	edx
+
+	mov     esi, [ebp + 8] ; Source
+	mov		edx, 0		; length
+
+.1:
+	mov     al, [esi]
+	inc     esi  
+
+	inc		edx
+	cmp     al, 0           ; 是否遇到 '\0'
+	jnz     .1              ; 没遇到就继续循环，遇到就结束
+
+	dec		edx
+
+	mov 	eax, edx		; 据说c语言在eax处接收返回参数
+
+	pop		edx
+	pop		esi
+
+	mov	esp, ebp
+	pop	ebp
+	ret

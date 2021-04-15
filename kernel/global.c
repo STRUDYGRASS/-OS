@@ -25,4 +25,4 @@ PUBLIC	irq_handler		irq_table[NR_IRQ];
 PUBLIC	TTY		tty_table[NR_CONSOLES];
 PUBLIC	CONSOLE		console_table[NR_CONSOLES];
 
-PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {};
+PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {sys_write};

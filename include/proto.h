@@ -49,13 +49,23 @@ PUBLIC void select_console(int nr_console);
 PUBLIC void init_screen(TTY* p_tty);
 PUBLIC int  is_current_console(CONSOLE* p_con);;
 
+/* printf.c */
+PUBLIC  int     printf(const char *fmt, ...);
+
+/* vsprintf.c */
+PUBLIC  int     vsprintf(char *buf, const char *fmt, va_list args);
+
 
 // /* 以下是系统调用相关 */
 
-// /* proc.c */
+/* 系统调用 - 系统级 */
 // PUBLIC  int     sys_get_ticks();        /* sys_call */
+PUBLIC  int     sys_write(char* buf, int len, PROCESS* p_proc);
 
-// /* syscall.asm */
-// PUBLIC  void    sys_call();             /* int_handler */
+/* syscall.asm */
+PUBLIC  void    sys_call();             /* int_handler */
+
+
+/* 系统调用 - 用户级 */
 // PUBLIC  int     get_ticks();
-
+PUBLIC  void    write(char* buf, int len);

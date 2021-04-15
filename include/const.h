@@ -85,6 +85,6 @@
 #define NR_CONSOLES	3	/* consoles */
 
 /* system call */
-#define NR_SYS_CALL     0
+#define NR_SYS_CALL     2
 
 #endif /* _YUNFEI_CONST_H */

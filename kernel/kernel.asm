@@ -4,7 +4,7 @@
  ; @Autor: Yunfei
  ; @Date: 2021-03-09 22:11:04
  ; @LastEditors: Yunfei
- ; @LastEditTime: 2021-04-15 16:39:20
+ ; @LastEditTime: 2021-04-15 21:14:27
  ;***
 %include "sconst.inc"
 
@@ -339,10 +339,12 @@ save:
 ; ====================================================================================
 sys_call:
         call    save
-
+	push	dword [p_proc_ready]
         sti
-
+	push	ecx
+	push	ebx
         call    [sys_call_table + eax * 4]
+	add	esp, 4 * 3 ;c-style: 函数调用者清理堆栈
         mov     [esi + EAXREG - P_STACKBASE], eax
 
         cli
