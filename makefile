@@ -13,7 +13,7 @@ CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I boot/include/
 ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -fno-builtin -m32  -fno-stack-protector -Wno-implicit-function-declaration
+CFLAGS		= -I include/ -c -fno-builtin -m32  -fno-stack-protector #-Wno-implicit-function-declaration
 #忽略标准库冲突函数，强制不进行栈检查，忽略函数定义未找到警告（asm中）
 LDFLAGS		= -s -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
@@ -22,7 +22,7 @@ DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 OSBOOT = boot/boot.bin boot/loader.bin
 OSKERNEL = kernel.bin
 OBJS = kernel/kernel.o kernel/start.o kernel/main.o \
-		kernel/clock.o kernel/syscall.o \
+		kernel/clock.o kernel/syscall.o kernel/proc.o \
 		kernel/keyboard.o kernel/tty.o kernel/console.o \
 		kernel/i8259.o kernel/global.o kernel/protect.o \
 		lib/kliba.o  lib/string.o lib/klib.o
@@ -105,6 +105,9 @@ kernel/clock.o : kernel/clock.c
 
 kernel/syscall.o : kernel/syscall.asm include/sconst.inc
 	$(ASM) $(ASMKFLAGS) -o $@ $<
+
+kernel/proc.o : kernel/proc.c 
+	$(CC)  $(CFLAGS) -o $@ $<
 
 kernel/keyboard.o : kernel/keyboard.c include/keymap.h
 	$(CC)  $(CFLAGS) -o $@ $<

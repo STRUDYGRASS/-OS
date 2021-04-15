@@ -4,7 +4,7 @@
  * @Autor: Yunfei
  * @Date: 2021-04-11 15:55:08
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-11 19:02:16
+ * @LastEditTime: 2021-04-13 16:56:43
  */
 
 #include "head_unit.h"
@@ -57,31 +57,6 @@ PUBLIC int is_current_console(CONSOLE* p_con)
 /*======================================================================*
 			   Display
  *======================================================================*/
-PUBLIC void out_char(CONSOLE* p_con, char ch)//直接写入显存对应地址
-{
-	u8* p_vmem = (u8*)(V_MEM_BASE + p_con->cursor * 2);//对应显存中单字符需要两字节存储
-
-	*p_vmem++ = ch;
-	*p_vmem++ = DEFAULT_CHAR_COLOR;
-	p_con->cursor++;
-
-	set_cursor(p_con->cursor);
-}
-
-
-PRIVATE void set_cursor(unsigned int position)
-{
-	disable_int();
-	out_byte(CRTC_ADDR_REG, CURSOR_H);
-	out_byte(CRTC_DATA_REG, (position >> 8) & 0xFF);
-	out_byte(CRTC_ADDR_REG, CURSOR_L);
-	out_byte(CRTC_DATA_REG, position & 0xFF);
-	enable_int();
-}
-
-/*======================================================================*
-			    Display Over
- *======================================================================*/
 
 /*======================================================================*
 			  set_video_start_addr
@@ -97,6 +72,68 @@ PRIVATE void set_video_start_addr(u32 addr)
 }
 
 
+PUBLIC void out_char(CONSOLE* p_con, char ch)//直接写入显存对应地址
+{
+	u8* p_vmem = (u8*)(V_MEM_BASE + p_con->cursor * 2);//对应显存中单字符需要两字节存储
+
+	switch (ch)
+	{
+		case '\n':
+			if (p_con->cursor < p_con->original_addr +
+				p_con->v_mem_limit - SCREEN_WIDTH) {
+				p_con->cursor = p_con->original_addr + SCREEN_WIDTH * 
+					((p_con->cursor - p_con->original_addr) /
+					SCREEN_WIDTH + 1);
+			}
+			break;
+		case '\b':
+			if (p_con->cursor > p_con->original_addr) {
+				p_con->cursor--;
+				*(p_vmem-2) = ' ';
+				*(p_vmem-1) = DEFAULT_CHAR_COLOR;
+			}
+			break;
+		default:
+			if (p_con->cursor < p_con->original_addr + p_con->v_mem_limit - 1) { //边界检验，多了不输出
+				*p_vmem++ = ch;
+				*p_vmem++ = DEFAULT_CHAR_COLOR;
+				p_con->cursor++;
+			}
+			break;
+	}
+	while (p_con->cursor >= p_con->current_start_addr + SCREEN_SIZE) { //若输入到底，自动滚行
+		scroll_screen(p_con, SCR_DN);
+	}
+
+	flush(p_con);
+}
+
+
+PRIVATE void set_cursor(unsigned int position)
+{
+	disable_int();
+	out_byte(CRTC_ADDR_REG, CURSOR_H);
+	out_byte(CRTC_DATA_REG, (position >> 8) & 0xFF);
+	out_byte(CRTC_ADDR_REG, CURSOR_L);
+	out_byte(CRTC_DATA_REG, position & 0xFF);
+	enable_int();
+}
+
+PRIVATE void flush(CONSOLE* p_con)
+{
+	if (is_current_console(p_con)) {
+		set_cursor(p_con->cursor);
+		set_video_start_addr(p_con->current_start_addr);
+	}
+}
+
+
+/*======================================================================*
+			    Display Over
+ *======================================================================*/
+
+
+
 
 /*======================================================================*
 			   select_console
@@ -109,6 +146,35 @@ PUBLIC void select_console(int nr_console)	/* 0 ~ (NR_CONSOLES - 1) */
 
 	nr_current_console = nr_console;
 
-	set_cursor(console_table[nr_console].cursor);
-	set_video_start_addr(console_table[nr_console].current_start_addr);
+	flush(&console_table[nr_console]);
 }
+
+/*======================================================================*
+			   scroll_screen
+ *----------------------------------------------------------------------*
+ 滚屏.
+ *----------------------------------------------------------------------*
+ direction:
+	SCR_UP	: 向上滚屏
+	SCR_DN	: 向下滚屏
+	其它	: 不做处理
+ *======================================================================*/
+PUBLIC void scroll_screen(CONSOLE* p_con, int direction)
+{
+	if (direction == SCR_UP) {
+		if (p_con->current_start_addr > p_con->original_addr) {
+			p_con->current_start_addr -= SCREEN_WIDTH;
+		}
+	}
+	else if (direction == SCR_DN) {
+		if (p_con->current_start_addr + SCREEN_SIZE <
+		    p_con->original_addr + p_con->v_mem_limit) {
+			p_con->current_start_addr += SCREEN_WIDTH;
+		}
+	}
+	else{
+	}
+
+	flush(p_con);
+}
+
