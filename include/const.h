@@ -7,6 +7,15 @@
 #ifndef	_YUNFEI_CONST_H
 #define	_YUNFEI_CONST_H
 
+/* the assert macro */
+#define ASSERT
+#ifdef ASSERT
+void assertion_failure(char *exp, char *file, char *base_file, int line);
+#define assert(exp)  if (exp) ; \
+        else assertion_failure(#exp, __FILE__, __BASE_FILE__, __LINE__)
+#else
+#define assert(exp)
+#endif
 
 /* EXTERN */
 #define	EXTERN	extern	/* EXTERN is defined as extern except in global.c */
@@ -58,6 +67,24 @@
 #define LED_CODE	0xED
 #define KB_ACK		0xFA
 
+#define	STR_DEFAULT_LEN	1024
+
+/* Color */
+/*
+ * e.g. MAKE_COLOR(BLUE, RED)
+ *      MAKE_COLOR(BLACK, RED) | BRIGHT
+ *      MAKE_COLOR(BLACK, RED) | BRIGHT | FLASH
+ */
+#define BLACK   0x0     /* 0000 */
+#define WHITE   0x7     /* 0111 */
+#define RED     0x4     /* 0100 */
+#define GREEN   0x2     /* 0010 */
+#define BLUE    0x1     /* 0001 */
+#define FLASH   0x80    /* 1000 0000 */
+#define BRIGHT  0x08    /* 0000 1000 */
+#define	MAKE_COLOR(x,y)	((x<<4) | y) /* MAKE_COLOR(Background,Foreground) */
+
+
 /* VGA */
 #define	CRTC_ADDR_REG	0x3D4	/* CRT Controller Registers - Addr Register */
 #define	CRTC_DATA_REG	0x3D5	/* CRT Controller Registers - Data Register */
@@ -85,6 +112,48 @@
 #define NR_CONSOLES	3	/* consoles */
 
 /* system call */
-#define NR_SYS_CALL     2
+#define NR_SYS_CALL     3
+
+/* Process */
+#define SENDING   0x02	/* set when proc trying to send */
+#define RECEIVING 0x04	/* set when proc trying to recv */
+
+/* tasks */
+/* 注意 TASK_XXX 的定义要与 global.c 中对应 */
+#define INVALID_DRIVER	-20
+#define INTERRUPT	-10
+#define TASK_TTY	0
+#define TASK_SYS	1
+/* #define TASK_WINCH	2 */
+/* #define TASK_FS	3 */
+/* #define TASK_MM	4 */
+#define ANY		(NR_TASKS + NR_PROCS + 10)
+#define NO_TASK		(NR_TASKS + NR_PROCS + 20)
+
+/* ipc */
+#define SEND		1
+#define RECEIVE		2
+#define BOTH		3	/* BOTH = (SEND | RECEIVE) */
+
+/* magic chars used by `printx' */
+#define MAG_CH_PANIC	'\002'
+#define MAG_CH_ASSERT	'\003'
+
+/**
+ * @enum msgtype
+ * @brief MESSAGE types
+ */
+enum msgtype {
+	/* 
+	 * when hard interrupt occurs, a msg (with type==HARD_INT) will
+	 * be sent to some tasks
+	 */
+	HARD_INT = 1,
+
+	/* SYS task */
+	GET_TICKS,
+};
+
+#define	RETVAL		u.m3.m3i1
 
 #endif /* _YUNFEI_CONST_H */

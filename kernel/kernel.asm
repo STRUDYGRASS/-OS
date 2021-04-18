@@ -4,7 +4,7 @@
  ; @Autor: Yunfei
  ; @Date: 2021-03-09 22:11:04
  ; @LastEditors: Yunfei
- ; @LastEditTime: 2021-04-15 21:14:27
+ ; @LastEditTime: 2021-04-18 13:21:44
  ;***
 %include "sconst.inc"
 
@@ -315,9 +315,18 @@ save:
 	push	es	;  | 保存原寄存器值
 	push	fs	;  |
 	push	gs	; /
+
+	;; 注意，从这里开始，一直到 `mov esp, StackTop'，中间坚决不能用 push/pop 指令，
+	;; 因为当前 esp 指向 proc_table 里的某个位置，push 会破坏掉进程表，导致灾难性后果！
+
+	mov	esi, edx	; 保存 edx，因为 edx 里保存了系统调用的参数
+				;（没用栈，而是用了另一个寄存器 esi）
 	mov	dx, ss
 	mov	ds, dx
 	mov	es, dx
+	mov fs, dx
+
+	mov	edx, esi	; 恢复 edx
 
 	; inc	byte [gs:0]		; 改变屏幕第 0 行, 第 0 列的字符
 
@@ -339,12 +348,17 @@ save:
 ; ====================================================================================
 sys_call:
         call    save
+		sti
+	push	esi
+
 	push	dword [p_proc_ready]
-        sti
+	push 	edx
 	push	ecx
 	push	ebx
         call    [sys_call_table + eax * 4]
-	add	esp, 4 * 3 ;c-style: 函数调用者清理堆栈
+	add	esp, 4 * 4 ;c-style: 函数调用者清理堆栈
+
+	pop		esi
         mov     [esi + EAXREG - P_STACKBASE], eax
 
         cli

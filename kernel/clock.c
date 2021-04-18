@@ -13,9 +13,14 @@
  *======================================================================*/
 PUBLIC void clock_handler(int irq)
 {
-	// disp_str("#");
-	if (k_reenter != 0){//若有重入，打印感叹号后返回
-		// disp_str("!");
+	ticks++;
+	p_proc_ready->ticks--;
+
+	if (k_reenter != 0) {
+		return;
+	}
+
+	if (p_proc_ready->ticks > 0) {
 		return;
 	}
 	schedule();

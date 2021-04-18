@@ -10,7 +10,8 @@
 PUBLIC	PROCESS	proc_table[NR_TASKS + NR_PROCS];
 
 PUBLIC	TASK	task_table[NR_TASKS] = {
-	{task_tty, STACK_SIZE_TTY, "tty"}};
+	{task_tty, STACK_SIZE_TTY, "tty"},
+	{task_sys, STACK_SIZE_SYS, "SYS"}};
 
 PUBLIC  TASK    user_proc_table[NR_PROCS] = {
 	{TestA, STACK_SIZE_TESTA, "TestA"},
@@ -25,4 +26,5 @@ PUBLIC	irq_handler		irq_table[NR_IRQ];
 PUBLIC	TTY		tty_table[NR_CONSOLES];
 PUBLIC	CONSOLE		console_table[NR_CONSOLES];
 
-PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {sys_write};
+PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {sys_printx,
+						       sys_sendrec};

@@ -5,8 +5,7 @@
                                                     Forrest Yu, 2005
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include "type.h"
-#include "const.h"
+#include "head_unit.h"
 
 /******************************************************************************************
                         可变参数函数调用原理（其中涉及的数字皆为举例）
@@ -56,7 +55,8 @@ int printf(const char *fmt, ...)
 
 	va_list arg = (va_list)((char*)(&fmt) + 4); /*4是参数fmt所占堆栈中的大小*/
 	i = vsprintf(buf, fmt, arg);
-	write(buf, i);
+	buf[i] = 0;
+	printx(buf);
 
 	return i;
 }

@@ -22,11 +22,11 @@ DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 OSBOOT = boot/boot.bin boot/loader.bin
 OSKERNEL = kernel.bin
 OBJS = kernel/kernel.o kernel/start.o kernel/main.o \
-		kernel/clock.o kernel/syscall.o kernel/proc.o \
+		kernel/clock.o kernel/syscall.o kernel/proc.o kernel/systask.o \
 		kernel/keyboard.o kernel/tty.o kernel/console.o \
 		kernel/printf.o kernel/vsprintf.o \
 		kernel/i8259.o kernel/global.o kernel/protect.o \
-		lib/kliba.o  lib/string.o lib/klib.o
+		lib/kliba.o  lib/string.o lib/klib.o lib/misc.o
 DASMOUTPUT = kernel.bin.asm
 
 # 关于C的借助gcc和.d文件的自动寻找依赖可以实现，然而最后还是希望能够手打依赖——因为目前所涉及的项目还是不算巨大，可以加深映像;具体的实现在隔壁
@@ -107,6 +107,9 @@ kernel/clock.o : kernel/clock.c
 kernel/syscall.o : kernel/syscall.asm include/sconst.inc
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
+kernel/systask.o : kernel/systask.c 
+	$(CC)	$(CFLAGS) -o $@ $<
+
 kernel/proc.o : kernel/proc.c 
 	$(CC)  $(CFLAGS) -o $@ $<
 
@@ -137,3 +140,6 @@ lib/string.o : lib/string.asm
 
 lib/kliba.o : lib/kliba.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
+
+lib/misc.o: lib/misc.c
+	$(CC) $(CFLAGS) -o $@ $<	
