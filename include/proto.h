@@ -13,6 +13,8 @@ PUBLIC void	disp_str(char * info);
 PUBLIC void	disp_color_str(char * info, int color);
 PUBLIC void	disable_irq(int irq);
 PUBLIC void	enable_irq(int irq);
+PUBLIC void	port_read(u16 port, void* buf, int n);
+PUBLIC void	port_write(u16 port, void* buf, int n);
 PUBLIC void	disable_int();
 PUBLIC void	enable_int();
 
@@ -61,6 +63,13 @@ PUBLIC void spurious_irq(int irq);
 PUBLIC void clock_handler(int irq);
 PUBLIC void init_clock();
 
+/* fs/main.c */
+PUBLIC void task_fs();
+
+/* kernel/hd.c */
+PUBLIC void	task_hd();
+PUBLIC void	hd_handler(int irq);
+
 /* keyboard.c */
 PUBLIC void init_keyboard();
 PUBLIC void keyboard_read(TTY* p_tty);
@@ -92,6 +101,7 @@ PUBLIC	void	reset_msg(MESSAGE* p);
 PUBLIC	void	dump_msg(const char * title, MESSAGE* m);
 PUBLIC	void	dump_proc(PROCESS * p);
 PUBLIC	int	send_recv(int function, int src_dest, MESSAGE* msg);
+PUBLIC void	inform_int(int task_nr);
 
 /* lib/misc.c */
 PUBLIC void spin(char * func_name);
