@@ -12,7 +12,7 @@
 // #include "string.h"
 
 PUBLIC int kernel_main(){
-    disp_str("-----\"kernel_main\" begins-----\n");
+    // disp_str("-----\"kernel_main\" begins-----\n");
 
 	TASK*		p_task		= task_table;
 	PROCESS*	p_proc		= proc_table;
@@ -90,7 +90,7 @@ PUBLIC int kernel_main(){
 	proc_table[NR_TASKS + 2].nr_tty = 1;
 
 	init_clock();
-	init_keyboard();
+	// init_keyboard(); 放入tty中初始化
 
 	restart();
 
@@ -117,8 +117,8 @@ void TestA()
 	while(1){
 		// disp_str("A");
 		// disp_str(".");
-		// printf("A:%x",get_ticks());
-		delay(1);
+		printf("<Ticks:%8d>", get_ticks());
+		delay(10);
 	}
 }
 

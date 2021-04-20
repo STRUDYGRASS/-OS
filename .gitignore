@@ -1,3 +1,4 @@
+# vscode config file 
 .vscode/
 
 # shell and image
@@ -6,5 +7,10 @@
 bochsrc
 
 # midlle product
-*.bin
 *.o
+
+# the last product
+*.bin
+
+# the temp product
+*.lock

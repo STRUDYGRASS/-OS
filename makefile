@@ -13,8 +13,12 @@ CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I boot/include/
 ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -fno-builtin -m32  -fno-stack-protector #-Wno-implicit-function-declaration
-#忽略标准库冲突函数，强制不进行栈检查，忽略函数定义未找到警告（asm中）
+CFLAGS		= -I include/ -c -fno-builtin -m32  -fno-stack-protector \
+# # -fpack-struct  -Wno-implicit-function-declaration
+#忽略标准库冲突函数，强制不进行栈检查， \
+-fpack-struct将所有结构成员无缝隙地压缩在一起。因为它使代码程序效率大大降低，且结构成员的偏移量与系统库不相符，\
+		这么做有时可能导致寻址错误，所以一般不使用这个选项。\
+忽略函数定义未找到警告（asm中）
 LDFLAGS		= -s -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 

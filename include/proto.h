@@ -17,12 +17,13 @@ PUBLIC void	port_read(u16 port, void* buf, int n);
 PUBLIC void	port_write(u16 port, void* buf, int n);
 PUBLIC void	disable_int();
 PUBLIC void	enable_int();
+PUBLIC void bochs_magic_break();
 
 /* string.asm */
 PUBLIC char*	strcpy(char* dst, const char* src);
 PUBLIC void*    memcpy(void* p_dst, void* p_src, int size);
 PUBLIC void     memset(void* p_dst, char ch, int size);
-PUBLIC unsigned int strlen(const char* s);
+PUBLIC int      strlen(const char* s);
 /**
  * `phys_copy' and `phys_set' are used only in the kernel, where segments
  * are all flat (based on 0). In the meanwhile, currently linear address

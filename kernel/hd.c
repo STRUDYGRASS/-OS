@@ -4,7 +4,7 @@
  * @Autor: Yunfei
  * @Date: 2021-04-19 18:49:33
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-19 18:53:58
+ * @LastEditTime: 2021-04-20 22:13:01
 ******************************************************************************/
 #include "head_unit.h"
 
@@ -31,7 +31,7 @@ PUBLIC void task_hd()
 {
 	MESSAGE msg;
 
-	init_hd();
+	// init_hd();
 
 	while (1) {
 		send_recv(RECEIVE, ANY, &msg);

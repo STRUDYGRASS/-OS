@@ -47,7 +47,7 @@ disp_str:
     mov esi, [ebp + 8]  ;pszInfo  进来之前：-4，push ebp后是-8,所以ebp+8 就正好是指向当前字符串
     mov edi, [disp_pos] ;将地址存放的显示位置赋予给edi
     mov ah, 0Fh         ;改变颜色
-.1
+.1:
     lodsb               ;装入一个byte到al
     test    al,al
     jz  .2              ;若是无byte
@@ -64,11 +64,11 @@ disp_str:
     mov edi, eax
     pop eax
     jmp .1              ;以上作用：另起一行
-.3
+.3:
     mov [gs:edi],ax     ;ax 赋给视频段地址
     add edi,2           ;因为是ax，所以edi要+2
     jmp .1
-.2
+.2:
     mov [disp_pos], edi
 
     pop edi

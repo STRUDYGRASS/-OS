@@ -115,32 +115,53 @@ strcpy:
 	ret                     ; 函数结束，返回
 ; strcpy 结束-------------------------------------------------------------
 
-
+; ------------------------------------------------------------------------
+; int strlen(char* p_str);
+; ------------------------------------------------------------------------
 strlen:
-	push    ebp
-	mov     ebp, esp
+        push    ebp
+        mov     ebp, esp
 
-	push	esi
-	push	edx
-
-	mov     esi, [ebp + 8] ; Source
-	mov		edx, 0		; length
+        mov     eax, 0                  ; 字符串长度开始是 0
+        mov     esi, [ebp + 8]          ; esi 指向首地址
 
 .1:
-	mov     al, [esi]
-	inc     esi  
+        cmp     byte [esi], 0           ; 看 esi 指向的字符是否是 '\0'
+        jz      .2                      ; 如果是 '\0'，程序结束
+        inc     esi                     ; 如果不是 '\0'，esi 指向下一个字符
+        inc     eax                     ;         并且，eax 自加一
+        jmp     .1                      ; 如此循环
 
-	inc		edx
-	cmp     al, 0           ; 是否遇到 '\0'
-	jnz     .1              ; 没遇到就继续循环，遇到就结束
+.2:
+        pop     ebp
+        ret                             ; 函数结束，返回
+; ------------------------------------------------------------------------
 
-	dec		edx
+; strlen:
+; 	push    ebp
+; 	mov     ebp, esp
 
-	mov 	eax, edx		; 据说c语言在eax处接收返回参数
+; 	push	esi
+; 	push	edx
 
-	pop		edx
-	pop		esi
+; 	mov     esi, [ebp + 8] ; Source
+; 	mov		edx, 0		; length
 
-	mov	esp, ebp
-	pop	ebp
-	ret
+; .1:
+; 	mov     al, [esi]
+; 	inc     esi  
+
+; 	inc		edx
+; 	cmp     al, 0           ; 是否遇到 '\0'
+; 	jnz     .1              ; 没遇到就继续循环，遇到就结束
+
+; 	dec		edx
+
+; 	mov 	eax, edx		; 据说c语言在eax处接收返回参数
+
+; 	pop		edx
+; 	pop		esi
+
+; 	mov	esp, ebp
+; 	pop	ebp
+; 	ret
