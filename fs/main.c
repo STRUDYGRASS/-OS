@@ -4,7 +4,7 @@
  * @Autor: Yunfei
  * @Date: 2021-04-19 19:53:07
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-20 22:12:29
+ * @LastEditTime: 2021-04-21 15:28:07
 ******************************************************************************/
 #include "head_unit.h"
 
@@ -21,13 +21,13 @@
  *****************************************************************************/
 PUBLIC void task_fs()
 {
-	// printl("Task FS begins.\n");
+	printl("Task FS begins.\n");
 
 	/* open the device: hard disk */
 	MESSAGE driver_msg;
 	driver_msg.type = DEV_OPEN;
-	// send_recv(BOTH, TASK_HD, &driver_msg);
+	send_recv(BOTH, TASK_HD, &driver_msg);
 
-	// spin("FS");
+	spin("FS");
 	while(1){}
 }

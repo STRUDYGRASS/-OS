@@ -117,7 +117,7 @@ void TestA()
 	while(1){
 		// disp_str("A");
 		// disp_str(".");
-		printf("<Ticks:%8d>", get_ticks());
+		// printf("<Ticks:%8d>", get_ticks());
 		delay(10);
 	}
 }

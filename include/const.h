@@ -210,11 +210,11 @@ enum msgtype {
 #define	INVALID_INODE		0
 #define	ROOT_INODE		1
 
-#define	MAX_DRIVES		2
-#define	NR_PART_PER_DRIVE	4
-#define	NR_SUB_PER_PART		16
+#define	MAX_DRIVES		2 //支持硬盘数目
+#define	NR_PART_PER_DRIVE	4 //分区个数
+#define	NR_SUB_PER_PART		16 //每个扩展分区最多有多少个逻辑分区
 #define	NR_SUB_PER_DRIVE	(NR_SUB_PER_PART * NR_PART_PER_DRIVE)
-#define	NR_PRIM_PER_DRIVE	(NR_PART_PER_DRIVE + 1)
+#define	NR_PRIM_PER_DRIVE	(NR_PART_PER_DRIVE + 1) //hd[0-4]
 
 /**
  * @def MAX_PRIM
