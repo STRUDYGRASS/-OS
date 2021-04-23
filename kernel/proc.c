@@ -193,8 +193,7 @@ PUBLIC int ldt_seg_linear(PROCESS* p, int idx)
  *				  va2la
  *****************************************************************************/
 /**
- * <Ring 0~1> Virtual addr --> Linear addr.
- * 
+ * <Ring 0~1> Virtual addr --> Linear addr. 注：此处实地址为LDT基址加上偏移虚拟地址，因所有进程LDT选择子都相同，所以都在同一段中，但每个进程的esp在进程初始化时设置为不同的值
  * @param pid  PID of the proc whose address is to be calculated.
  * @param va   Virtual address.
  * 
@@ -207,7 +206,7 @@ PUBLIC void* va2la(int pid, void* va)
 	u32 seg_base = ldt_seg_linear(p, INDEX_LDT_RW);
 	u32 la = seg_base + (u32)va;
 
-	if (pid < NR_TASKS + NR_PROCS) {
+	if (pid < NR_TASKS + NR_PROCS) { //现在是直接映射？
 		assert(la == (u32)va);
 	}
 

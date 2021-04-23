@@ -31,7 +31,8 @@ OBJS = kernel/kernel.o kernel/start.o kernel/main.o \
 		kernel/keyboard.o kernel/tty.o kernel/console.o \
 		kernel/printf.o kernel/vsprintf.o \
 		kernel/i8259.o kernel/global.o kernel/protect.o \
-		fs/main.o \
+		fs/main.o fs/open.o fs/misc.o \
+		lib/open.o lib/close.o \
 		lib/kliba.o  lib/string.o lib/klib.o lib/misc.o
 DASMOUTPUT = kernel.bin.asm
 
@@ -141,6 +142,12 @@ kernel/hd.o: kernel/hd.c
 fs/main.o : fs/main.c 
 	$(CC) $(CFLAGS) -o $@ $<
 
+fs/open.o : fs/open.c 
+	$(CC) $(CFLAGS) -o $@ $<
+
+fs/misc.o : fs/misc.c 
+	$(CC) $(CFLAGS) -o $@ $<
+
 
 # Library
 # lib/klib.o : lib/klib.c include/type.h include/const.h include/protect.h \
@@ -157,3 +164,10 @@ lib/kliba.o : lib/kliba.asm
 
 lib/misc.o: lib/misc.c
 	$(CC) $(CFLAGS) -o $@ $<	
+
+# ## 进程到文件系统的调用接口函数 
+lib/open.o: lib/open.c
+	$(CC) $(CFLAGS) -o $@ $<	
+
+lib/close.o: lib/close.c
+	$(CC) $(CFLAGS) -o $@ $<

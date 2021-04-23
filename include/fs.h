@@ -26,7 +26,7 @@ struct dev_drv_map {
 #define	MAGIC_V1	0x111
 
 /**
- * @struct super_block fs.h "include/fs.h"
+ * @struct superblock fs.h "include/fs.h"
  * @brief  The 2nd sector of the FS
  *
  * Remember to change SUPER_BLOCK_SIZE if the members are changed.
@@ -34,30 +34,8 @@ struct dev_drv_map {
  * @attention Remember to change boot/include/load.inc::SB_* if the members
  *            are changed.
  *
- * \dot
- * digraph super_block {
- *         node [shape=plaintext];
- * 
- *         sb [label=<<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0">
- *                 <TR>
- *                         <TD HEIGHT="20" WIDTH="70" ALIGN="right" VALIGN="top" BORDER="0">Sector #&nbsp;</TD>
- *                         <TD HEIGHT="20" WIDTH="90" ALIGN="left" VALIGN="top" BORDER="0">0</TD>
- *                         <TD HEIGHT="20" WIDTH="90" ALIGN="left" VALIGN="top" BORDER="0">1</TD>
- *                         <TD HEIGHT="20" WIDTH="290" ALIGN="center" VALIGN="top" BORDER="0">...</TD>
- *                         <TD HEIGHT="20" WIDTH="10" ALIGN="right" BORDER="0"></TD>
- *                 </TR>
- *                 <TR>
- *                         <TD HEIGHT="30" WIDTH="70" ALIGN="right" BORDER="0"></TD>
- *                         <TD HEIGHT="30" WIDTH="90" ALIGN="center" BORDER="1" BGCOLOR="white">Boot Sector</TD>
- *                         <TD HEIGHT="30" WIDTH="90" ALIGN="center" BORDER="1" BGCOLOR="grey">Super Block</TD>
- *                         <TD HEIGHT="30" WIDTH="290" ALIGN="center" BORDER="1" BGCOLOR="white">...</TD>
- *                         <TD HEIGHT="30" WIDTH="10" ALIGN="right" BORDER="0"></TD>
- *                 </TR>
- *         </TABLE>>];
- * }
- * \enddot
- */
-struct super_block {
+*/
+typedef struct super_block {
 	u32	magic;		  /**< Magic number */
 	u32	nr_inodes;	  /**< How many inodes */
 	u32	nr_sects;	  /**< How many sectors (including bit maps) */
@@ -78,14 +56,8 @@ struct super_block {
 	 * the following item(s) are only present in memory
 	 */
 	int	sb_dev; 	/**< the super block's home device */
-};
+}SUPERBLOCK;
 
-/**
- * @def   SUPER_BLK_MAGIC_V1
- * @brief Magic number of super block, version 1.
- * @attention It must correspond with boot/include/load.h::SB_MAGIC_V1
- */
-#define	SUPER_BLK_MAGIC_V1		0x111
 
 /**
  * @def   SUPER_BLOCK_SIZE
@@ -112,7 +84,7 @@ struct super_block {
  *
  * \b NOTE: Remember to change INODE_SIZE if the members are changed
  */
-struct inode {
+typedef struct inode {
 	u32	i_mode;		/**< Accsess mode. Unused currently */
 	u32	i_size;		/**< File size */
 	u32	i_start_sect;	/**< The first sector of the data */
@@ -123,7 +95,7 @@ struct inode {
 	int	i_dev;
 	int	i_cnt;		/**< How many procs share this inode  */
 	int	i_num;		/**< inode nr.  */
-};
+}INODE;
 
 /**
  * @def   INODE_SIZE
@@ -135,14 +107,37 @@ struct inode {
 #define	INODE_SIZE	32
 
 /**
+ * @def   MAX_FILENAME_LEN
+ * @brief Max len of a filename
+ * @see   dir_entry
+ */
+#define	MAX_FILENAME_LEN	12
+
+/**
+ * @struct dir_entry
+ * @brief  Directory Entry
+ */
+typedef struct dir_entry {
+	int	inode_nr;		/**< inode nr. */
+	char	name[MAX_FILENAME_LEN];	/**< Filename */
+}DIR_ENTRY;
+
+/**
+ * @def   DIR_ENTRY_SIZE
+ * @brief The size of directory entry in the device.
+ *
+ * It is as same as the size in memory.
+ */
+#define	DIR_ENTRY_SIZE	sizeof(struct dir_entry)
+/**
  * @struct file_desc
  * @brief  File Descriptor
  */
-struct file_desc {
+typedef struct file_desc {
 	int		fd_mode;	/**< R or W */
 	int		fd_pos;		/**< Current position for R/W. */
 	struct inode*	fd_inode;	/**< Ptr to the i-node */
-};
+}FILE_DESCRIPTION;
 
 
 /**

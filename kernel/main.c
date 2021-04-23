@@ -114,12 +114,24 @@ PUBLIC int get_ticks()
  *======================================================================*/
 void TestA()
 {
-	while(1){
-		// disp_str("A");
-		// disp_str(".");
-		// printf("<Ticks:%8d>", get_ticks());
-		delay(10);
-	}
+	int fd;
+	int i, n;
+
+	char filename[MAX_FILENAME_LEN+1] = "blah";
+	const char bufw[] = "abcde";
+	const int rd_bytes = 3;
+	char bufr[rd_bytes];
+
+	assert(rd_bytes <= strlen(bufw));
+
+	/* create */
+	fd = open(filename, O_CREAT | O_RDWR);
+	assert(fd != -1);
+	printl("File created: %s (fd %d)\n", filename, fd);
+
+	/* close */
+	close(fd);
+	spin("test A");
 }
 
 /*======================================================================*

@@ -36,6 +36,5 @@ PUBLIC void cstart()
 
 	init_prot();
 
-	// bochs_magic_break();
 	// disp_str("-----\"cstart\" finished-----\n");
 }

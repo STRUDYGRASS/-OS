@@ -67,6 +67,7 @@ typedef struct s_proc {
 				    */
 
 	int nr_tty;
+	FILE_DESCRIPTION * filp[NR_FILES];
 }PROCESS;
 
 typedef struct s_task {

@@ -7,22 +7,13 @@
 #ifndef	_YUNFEI_CONST_H
 #define	_YUNFEI_CONST_H
 
-/* the assert macro */
-#define ASSERT
-#ifdef ASSERT
-void assertion_failure(char *exp, char *file, char *base_file, int line);
-#define assert(exp)  if (exp) ; \
-        else assertion_failure(#exp, __FILE__, __BASE_FILE__, __LINE__)
-#else
-#define assert(exp)
-#endif
 
-/* EXTERN */
-#define	EXTERN	extern	/* EXTERN is defined as extern except in global.c */
 
-/* 函数类型 */
-#define	PUBLIC		/* PUBLIC is the opposite of PRIVATE */
-#define	PRIVATE	static	/* PRIVATE x limits the scope of x */
+/* max() & min() */
+#define	max(a,b)	((a) > (b) ? (a) : (b))
+#define	min(a,b)	((a) < (b) ? (a) : (b))
+
+
 
 /* Boolean */
 #define	TRUE	1
@@ -67,7 +58,6 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define LED_CODE	0xED
 #define KB_ACK		0xFA
 
-#define	STR_DEFAULT_LEN	1024
 
 /* Color */
 /*
@@ -153,6 +143,15 @@ enum msgtype {
 	/* SYS task */
 	GET_TICKS,
 
+	/* TTY, SYS, FS, MM, etc */
+	SYSCALL_RET,
+
+	/* FS & TTY */
+	SUSPEND_PROC, RESUME_PROC,
+
+	/* FS */
+	OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK,
+	
 	/* message type for drivers */
 	DEV_OPEN = 1001,
 	DEV_CLOSE,
@@ -162,23 +161,22 @@ enum msgtype {
 };
 
 /* macros for messages */
-/* #define	FD		u.m3.m3i1 */
-/* #define	PATHNAME	u.m3.m3p1 */
-/* #define	FLAGS		u.m3.m3i1 */
-/* #define	NAME_LEN	u.m3.m3i2 */
+#define	FD		u.m3.m3i1
+#define	PATHNAME	u.m3.m3p1
+#define	FLAGS		u.m3.m3i1
+#define	NAME_LEN	u.m3.m3i2 
 #define	CNT		u.m3.m3i2
 #define	REQUEST		u.m3.m3i2
 #define	PROC_NR		u.m3.m3i3
 #define	DEVICE		u.m3.m3i4
 #define	POSITION	u.m3.m3l1
 #define	BUF		u.m3.m3p2
-/* #define	OFFSET		u.m3.m3i2 */
-/* #define	WHENCE		u.m3.m3i3 */
+#define	OFFSET		u.m3.m3i2
+#define	WHENCE		u.m3.m3i3
 
-/* #define	PID		u.m3.m3i2 */
+#define	PID		u.m3.m3i2
 /* #define	STATUS		u.m3.m3i1 */
 #define	RETVAL		u.m3.m3i1
-/* #define	STATUS		u.m3.m3i1 */
 
 
 

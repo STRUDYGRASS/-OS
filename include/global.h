@@ -33,3 +33,14 @@ extern	irq_handler	irq_table[];
 
 extern	TTY		tty_table[];
 extern  CONSOLE         console_table[];
+
+/* FS */
+EXTERN	FILE_DESCRIPTION	f_desc_table[NR_FILE_DESC];
+EXTERN	INODE		inode_table[NR_INODE];
+EXTERN	SUPERBLOCK	super_block[NR_SUPER_BLOCK];
+extern	u8 *			fsbuf;
+extern	const int		FSBUF_SIZE;
+EXTERN	MESSAGE			fs_msg;
+EXTERN	PROCESS *		pcaller; //调用者
+EXTERN	INODE *		root_inode;
+extern	struct dev_drv_map	dd_map[];
