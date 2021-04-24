@@ -68,14 +68,15 @@ PUBLIC int do_rdwt()
 		if (fs_msg.type == READ)
 			pos_end = min(pos + len, pin->i_size);
 		else		/* WRITE */
-			pos_end = min(pos + len, pin->i_nr_sects * SECTOR_SIZE);
+			pos_end = min(pos + len, pin->i_nr_sects * SECTOR_SIZE); //不能超过为文件分配的最大空间
 
 		int off = pos % SECTOR_SIZE;
 		int rw_sect_min=pin->i_start_sect+(pos>>SECTOR_SIZE_SHIFT);
+		printf("the start sect: %d",rw_sect_min);
 		int rw_sect_max=pin->i_start_sect+(pos_end>>SECTOR_SIZE_SHIFT);
 
 		int chunk = min(rw_sect_max - rw_sect_min + 1,
-				FSBUF_SIZE >> SECTOR_SIZE_SHIFT);
+				FSBUF_SIZE >> SECTOR_SIZE_SHIFT); //不能超过缓冲区的最大空间
 
 		int bytes_rw = 0;
 		int bytes_left = len;

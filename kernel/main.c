@@ -114,6 +114,7 @@ PUBLIC int get_ticks()
  *======================================================================*/
 void TestA()
 {
+	// for(;;);
 	int fd;
 	int i, n;
 
@@ -129,9 +130,28 @@ void TestA()
 	assert(fd != -1);
 	printl("File created: %s (fd %d)\n", filename, fd);
 
+	/* write */
+	n = write(fd, bufw, strlen(bufw));
+	assert(n == strlen(bufw));
+
 	/* close */
 	close(fd);
-	spin("test A");
+
+	/* open */
+	fd = open(filename, O_RDWR);
+	assert(fd != -1);
+	printl("File opened. fd: %d\n", fd);
+
+	/* read */
+	n = read(fd, bufr, rd_bytes);
+	assert(n == rd_bytes);
+	bufr[n] = 0;
+	printl("%d bytes read: %s\n", n, bufr);
+
+	/* close */
+	close(fd);
+
+	spin("testa");
 }
 
 /*======================================================================*

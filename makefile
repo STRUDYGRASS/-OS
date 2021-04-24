@@ -1,5 +1,5 @@
 # It must have the same value with 'KernelEntryPointPhyAddr' in load.inc!
-ENTRYPOINT	= 0x30400
+ENTRYPOINT	= 0x1000
 
 # Offset of entry point in kernel file
 # It depends on ENTRYPOINT
@@ -31,8 +31,8 @@ OBJS = kernel/kernel.o kernel/start.o kernel/main.o \
 		kernel/keyboard.o kernel/tty.o kernel/console.o \
 		kernel/printf.o kernel/vsprintf.o \
 		kernel/i8259.o kernel/global.o kernel/protect.o \
-		fs/main.o fs/open.o fs/misc.o \
-		lib/open.o lib/close.o \
+		fs/main.o fs/open.o fs/read_write.o fs/link.o fs/misc.o \
+		lib/open.o lib/close.o lib/read.o lib/write.o lib/unlink.o \
 		lib/kliba.o  lib/string.o lib/klib.o lib/misc.o
 DASMOUTPUT = kernel.bin.asm
 
@@ -139,9 +139,14 @@ fs/main.o : fs/main.c
 fs/open.o : fs/open.c 
 	$(CC) $(CFLAGS) -o $@ $<
 
+fs/read_write.o : fs/read_write.c 
+	$(CC) $(CFLAGS) -o $@ $<
+
 fs/misc.o : fs/misc.c 
 	$(CC) $(CFLAGS) -o $@ $<
 
+fs/link.o : fs/link.c 
+	$(CC) $(CFLAGS) -o $@ $<
 
 # Library
 lib/klib.o : lib/klib.c
@@ -161,4 +166,13 @@ lib/open.o: lib/open.c
 	$(CC) $(CFLAGS) -o $@ $<	
 
 lib/close.o: lib/close.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+lib/read.o: lib/read.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+lib/write.o: lib/write.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+lib/unlink.o: lib/unlink.c
 	$(CC) $(CFLAGS) -o $@ $<
