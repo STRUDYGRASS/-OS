@@ -12,8 +12,8 @@ DASM		= ndisasm
 CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I boot/include/
-ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -fno-builtin -m32  -fno-stack-protector \
+ASMKFLAGS	= -I include/ -I include/sys -f elf
+CFLAGS		= -I include/ -I include/sys -c -fno-builtin -m32  -fno-stack-protector \
 # # -fpack-struct  -Wno-implicit-function-declaration
 #忽略标准库冲突函数，强制不进行栈检查， \
 -fpack-struct将所有结构成员无缝隙地压缩在一起。因为它使代码程序效率大大降低，且结构成员的偏移量与系统库不相符，\
@@ -82,36 +82,30 @@ $(OSKERNEL) : $(OBJS)
 	$(LD) $(LDFLAGS) -o $(OSKERNEL) $(OBJS)
 
 # kernel element
-kernel/kernel.o : kernel/kernel.asm include/sconst.inc
+kernel/kernel.o : kernel/kernel.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
-kernel/start.o : kernel/start.c include/const.h include/protect.h include/type.h include/global.h \
-				include/proto.h include/proc.h \
-				# include/string.h
+kernel/start.o : kernel/start.c 
 	$(CC)  $(CFLAGS) -o $@ $<
 
-kernel/main.o: kernel/main.c include/type.h include/const.h include/protect.h  include/proc.h include/proto.h \
-			include/global.h \
+kernel/main.o: kernel/main.c 
 			# include/string.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 
-kernel/i8259.o: kernel/i8259.c include/type.h include/const.h include/protect.h \
- 			include/proto.h
+kernel/i8259.o: kernel/i8259.c 
 	$(CC)  $(CFLAGS) -o $@ $<
 
-kernel/global.o: kernel/global.c include/type.h include/const.h include/protect.h include/proc.h \
-			include/global.h include/proto.h
+kernel/global.o: kernel/global.c 
 	$(CC)  $(CFLAGS) -o $@ $<
 
-kernel/protect.o : kernel/protect.c include/type.h include/const.h include/protect.h include/proc.h include/proto.h \
-			include/global.h
+kernel/protect.o : kernel/protect.c 
 	$(CC)  $(CFLAGS) -o $@ $<
 
 kernel/clock.o : kernel/clock.c
 	$(CC)  $(CFLAGS) -o $@ $<
 
-kernel/syscall.o : kernel/syscall.asm include/sconst.inc
+kernel/syscall.o : kernel/syscall.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
 kernel/systask.o : kernel/systask.c 
@@ -120,7 +114,7 @@ kernel/systask.o : kernel/systask.c
 kernel/proc.o : kernel/proc.c 
 	$(CC)  $(CFLAGS) -o $@ $<
 
-kernel/keyboard.o : kernel/keyboard.c include/keymap.h
+kernel/keyboard.o : kernel/keyboard.c
 	$(CC)  $(CFLAGS) -o $@ $<
 
 kernel/tty.o : kernel/tty.c
@@ -150,11 +144,8 @@ fs/misc.o : fs/misc.c
 
 
 # Library
-# lib/klib.o : lib/klib.c include/type.h include/const.h include/protect.h \
-# 		 include/proto.h include/string.h include/global.h
-lib/klib.o : lib/klib.c include/const.h
+lib/klib.o : lib/klib.c
 	$(CC)  $(CFLAGS) -o $@ $<
-# 这个地方就已经将string.h的声明包含进去了，然后上面就是o文件的直接链接
 
 lib/string.o : lib/string.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<

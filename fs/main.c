@@ -4,7 +4,7 @@
  * @Autor: Yunfei
  * @Date: 2021-04-19 19:53:07
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-23 22:26:55
+ * @LastEditTime: 2021-04-24 14:16:25
 ******************************************************************************/
 #include "head_unit.h"
 
@@ -42,10 +42,10 @@ PUBLIC void task_fs()
 		case CLOSE:
 			fs_msg.RETVAL = do_close();
 			break;
-		// case READ:
-		// case WRITE:
-		// 	fs_msg.CNT = do_rdwt();
-		// 	break;
+		case READ:
+		case WRITE:
+			fs_msg.CNT = do_rdwt();
+			break;
 		// case UNLINK:
 		// 	fs_msg.RETVAL = do_unlink();
 		// 	break;
