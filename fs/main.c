@@ -4,7 +4,7 @@
  * @Autor: Yunfei
  * @Date: 2021-04-19 19:53:07
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-24 14:16:25
+ * @LastEditTime: 2021-04-25 15:16:36
 ******************************************************************************/
 #include "head_unit.h"
 
@@ -46,12 +46,12 @@ PUBLIC void task_fs()
 		case WRITE:
 			fs_msg.CNT = do_rdwt();
 			break;
-		// case UNLINK:
-		// 	fs_msg.RETVAL = do_unlink();
-		// 	break;
-		// case RESUME_PROC:
-		// 	src = fs_msg.PROC_NR;
-		// 	break;
+		case UNLINK:
+			fs_msg.RETVAL = do_unlink();
+			break;
+		case RESUME_PROC:
+			src = fs_msg.PROC_NR;
+			break;
 		/* case LSEEK: */
 		/* 	fs_msg.OFFSET = do_lseek(); */
 		/* 	break; */

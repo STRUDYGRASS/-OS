@@ -45,10 +45,38 @@ printf(fmt, i, j);
 
 ******************************************************************************************/
 
+
+
+/*****************************************************************************
+ *                                printf
+ *****************************************************************************/
+/**
+ * The most famous one.
+ *
+ * @param fmt  The format string
+ * 
+ * @return  The number of chars printed.
+ *****************************************************************************/
+PUBLIC int printf(const char *fmt, ...)
+{
+	int i;
+	char buf[STR_DEFAULT_LEN];
+
+	va_list arg = (va_list)((char*)(&fmt) + 4); /**
+						     * 4: size of `fmt' in
+						     *    the stack
+						     */
+	i = vsprintf(buf, fmt, arg);
+	int c = write(1, buf, i);
+
+	assert(c == i);
+
+	return i;
+}
 /*======================================================================*
-                                 printf
+                                 printl
  *======================================================================*/
-int printf(const char *fmt, ...)
+int printl(const char *fmt, ...)
 {
 	int i;
 	char buf[256];

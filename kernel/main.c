@@ -114,7 +114,7 @@ PUBLIC int get_ticks()
  *======================================================================*/
 void TestA()
 {
-	// for(;;);
+	for(;;);
 	int fd;
 	int i, n;
 
@@ -159,12 +159,28 @@ void TestA()
  *======================================================================*/
 void TestB()
 {
-	while(1){
-		// disp_str("B");
-		// disp_str(".");
-		// printf("B");
-		delay(1);
+	char tty_name[] = "/dev_tty1";
+
+	int fd_stdin  = open(tty_name, O_RDWR);
+	assert(fd_stdin  == 0);
+	int fd_stdout = open(tty_name, O_RDWR);
+	assert(fd_stdout == 1);
+
+	char rdbuf[128];
+
+	while (1) {
+		printf("$ ");
+		int r = read(fd_stdin, rdbuf, 70);
+		rdbuf[r] = 0;
+
+		if (strcmp(rdbuf, "hello") == 0)
+			printf("hello world!\n");
+		else
+			if (rdbuf[0])
+				printf("{%s}\n", rdbuf);
 	}
+
+	assert(0); /* never arrive here */
 }
 
 void TestC()

@@ -6,9 +6,11 @@
 #define TTY_FIRST	(tty_table)
 #define TTY_END		(tty_table + NR_CONSOLES)
 PRIVATE void init_tty(TTY* p_tty);
-PRIVATE void tty_do_read(TTY* p_tty);
-PRIVATE void tty_do_write(TTY* p_tty);
-PRIVATE void put_key(TTY* p_tty,u32 key);
+PRIVATE void	tty_dev_read	(TTY* tty);
+PRIVATE void	tty_dev_write	(TTY* tty);
+PRIVATE void	tty_do_read	(TTY* tty, MESSAGE* msg);
+PRIVATE void	tty_do_write	(TTY* tty, MESSAGE* msg);
+PRIVATE void	put_key		(TTY* tty, u32 key);
 
 
 /*======================================================================*
@@ -17,6 +19,7 @@ PRIVATE void put_key(TTY* p_tty,u32 key);
 PUBLIC void task_tty()
 {
 	TTY*	p_tty;
+	MESSAGE	msg;
 
 	init_keyboard();
 
@@ -26,9 +29,42 @@ PUBLIC void task_tty()
 	select_console(0);
 	while (1) {
 		for (p_tty=TTY_FIRST;p_tty<TTY_END;p_tty++) {
-			tty_do_read(p_tty);
-			tty_do_write(p_tty);
+			do {
+				tty_dev_read(p_tty);
+				tty_dev_write(p_tty);
+			} while (p_tty->inbuf_count); //保留处理键盘输入的代码不动
 		}
+
+			send_recv(RECEIVE, ANY, &msg); //接受进程传过来的消息并做处理
+
+			int src = msg.source;
+			assert(src != TASK_TTY);
+
+			TTY* ptty = &tty_table[msg.DEVICE];
+
+			switch (msg.type) {
+			case DEV_OPEN:
+				reset_msg(&msg);
+				msg.type = SYSCALL_RET;
+				send_recv(SEND, src, &msg);
+				break;
+			case DEV_READ:
+				tty_do_read(ptty, &msg);
+				break;
+			case DEV_WRITE:
+				tty_do_write(ptty, &msg);
+				break;
+			case HARD_INT:
+				/**
+				 * waked up by clock_handler -- a key was just pressed
+				 * @see clock_handler() inform_int() 若不激活，则tty进程会一直卡在接收进程消息上，不会理睬键盘输入了
+				 */
+				key_pressed = 0;
+				continue;
+			default:
+				dump_msg("TTY::unknown msg", &msg);
+				break;
+			}
 	}
 }
 
@@ -40,7 +76,7 @@ PRIVATE void init_tty(TTY* p_tty)
 	init_screen(p_tty);
 }
 
-PRIVATE void tty_do_read(TTY* p_tty)
+PRIVATE void tty_dev_read(TTY* p_tty)
 {
         if (is_current_console(p_tty->p_console))
         {
@@ -102,19 +138,102 @@ PUBLIC void in_process(TTY* p_tty,u32 key)
 		}
 }
 
-PRIVATE void tty_do_write(TTY* p_tty)
+PRIVATE void tty_dev_write(TTY* p_tty)
 {
-        if (p_tty->inbuf_count) {
+    while (p_tty->inbuf_count) { //这里采用while的原因不明，可能是为了bug处理
 		char ch = *(p_tty->p_inbuf_tail);
 		p_tty->p_inbuf_tail++;
-		if (p_tty->p_inbuf_tail == p_tty->in_buf + TTY_IN_BYTES) {
+		if (p_tty->p_inbuf_tail == p_tty->in_buf + TTY_IN_BYTES)
 			p_tty->p_inbuf_tail = p_tty->in_buf;
-		}
 		p_tty->inbuf_count--;
 
-		out_char(p_tty->p_console, ch);
+		if (p_tty->tty_left_cnt) {
+			if (ch >= ' ' && ch <= '~') { /* printable */
+				out_char(p_tty->p_console, ch);
+				void * p = p_tty->tty_req_buf +
+					   p_tty->tty_trans_cnt;
+				phys_copy(p, (void *)va2la(TASK_TTY, &ch), 1);
+				p_tty->tty_trans_cnt++;
+				p_tty->tty_left_cnt--;
+			}
+			else if (ch == '\b' && p_tty->tty_trans_cnt) { //进程传输指针修改，故在此截下
+				out_char(p_tty->p_console, ch);
+				p_tty->tty_trans_cnt--;
+				p_tty->tty_left_cnt++;
+			}
+
+			if (ch == '\n' || p_tty->tty_left_cnt == 0) { //enter后字符丢弃
+				out_char(p_tty->p_console, '\n');
+				MESSAGE msg;
+				msg.type = RESUME_PROC;
+				msg.PROC_NR = p_tty->tty_procnr;
+				msg.CNT = p_tty->tty_trans_cnt;
+				send_recv(SEND, p_tty->tty_caller, &msg);
+				p_tty->tty_left_cnt = 0;
+			}
+		}
 	}
 }
+
+/*****************************************************************************
+ *                                tty_do_read
+ *****************************************************************************/
+/**
+ * Invoked when task TTY receives DEV_READ message.
+ *
+ * @note The routine will return immediately after setting some members of
+ * TTY struct, telling FS to suspend the proc who wants to read. The real
+ * transfer (tty buffer -> proc buffer) is not done here.
+ * 
+ * @param tty  From which TTY the caller proc wants to read.
+ * @param msg  The MESSAGE just received.
+ *****************************************************************************/
+PRIVATE void tty_do_read(TTY* tty, MESSAGE* msg)
+{
+	/* tell the tty: */
+	tty->tty_caller   = msg->source;  /* who called, usually FS */
+	tty->tty_procnr   = msg->PROC_NR; /* who wants the chars */
+	tty->tty_req_buf  = va2la(tty->tty_procnr,
+				  msg->BUF);/* where the chars should be put */
+	tty->tty_left_cnt = msg->CNT; /* how many chars are requested */
+	tty->tty_trans_cnt= 0; /* how many chars have been transferred */
+
+	msg->type = SUSPEND_PROC;
+	msg->CNT = tty->tty_left_cnt;
+	send_recv(SEND, tty->tty_caller, msg);
+}
+
+
+/*****************************************************************************
+ *                                tty_do_write
+ *****************************************************************************/
+/**
+ * Invoked when task TTY receives DEV_WRITE message.
+ * 
+ * @param tty  To which TTY the calller proc is bound.
+ * @param msg  The MESSAGE.
+ *****************************************************************************/
+PRIVATE void tty_do_write(TTY* tty, MESSAGE* msg)
+{
+	char buf[TTY_OUT_BUF_LEN];
+	char * p = (char*)va2la(msg->PROC_NR, msg->BUF);
+	int i = msg->CNT;
+	int j;
+
+	while (i) {
+		int bytes = min(TTY_OUT_BUF_LEN, i);
+		phys_copy(va2la(TASK_TTY, buf), (void*)p, bytes);
+		for (j = 0; j < bytes; j++)
+			out_char(tty->p_console, buf[j]);
+		i -= bytes;
+		p += bytes;
+	}
+
+	msg->type = SYSCALL_RET;
+	send_recv(SEND, msg->source, msg);
+}
+
+
 
 PRIVATE void put_key(TTY* p_tty,u32 key)
 {
@@ -128,19 +247,7 @@ PRIVATE void put_key(TTY* p_tty,u32 key)
 		}
 }
 
-/*======================================================================*
-                              tty_write
-*======================================================================*/
-PUBLIC void tty_write(TTY* p_tty, char* buf, int len)
-{
-        char* p = buf;
-        int i = len;
 
-        while (i) {
-                out_char(p_tty->p_console, *p++);
-                i--;
-        }
-}
 
 /*======================================================================*
                               sys_printx
@@ -209,4 +316,37 @@ PUBLIC int sys_printx(int _unused1, int _unused2, char* s, PROCESS* p_proc)
 	}
 
 	return 0;
+}
+
+/*****************************************************************************
+ *                                dump_tty_buf
+ *****************************************************************************/
+/**
+ * For debug only.
+ * 
+ *****************************************************************************/
+PUBLIC void dump_tty_buf()
+{
+	TTY * tty = &tty_table[1];
+
+	static char sep[] = "--------------------------------\n";
+
+	printl(sep);
+
+	printl("head: %d\n", tty->p_inbuf_head - tty->in_buf);
+	printl("tail: %d\n", tty->p_inbuf_tail - tty->in_buf);
+	printl("cnt: %d\n", tty->inbuf_count);
+
+	int pid = tty->tty_caller;
+	printl("caller: %s (%d)\n", proc_table[pid].p_name, pid);
+	pid = tty->tty_procnr;
+	printl("caller: %s (%d)\n", proc_table[pid].p_name, pid);
+
+	printl("req_buf: %d\n", (int)tty->tty_req_buf);
+	printl("left_cnt: %d\n", tty->tty_left_cnt);
+	printl("trans_cnt: %d\n", tty->tty_trans_cnt);
+
+	printl("--------------------------------\n");
+
+	strcpy(sep, "\n");
 }

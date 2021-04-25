@@ -40,7 +40,8 @@ PUBLIC void keyboard_handler(int irq){
 			kb_in.p_head = kb_in.buf;
 		}
 		kb_in.count++;
-	};
+	}
+	key_pressed = 1;
 }
 
 PUBLIC void init_keyboard()

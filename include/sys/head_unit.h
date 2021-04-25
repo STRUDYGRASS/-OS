@@ -2,6 +2,7 @@
 #include "config.h"
 #include "stdio.h"
 #include "const.h"
+#include "string.h"
 #include "protect.h"
 #include "fs.h"
 #include "tty.h"
