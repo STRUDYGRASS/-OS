@@ -10,7 +10,6 @@
 /* 本文件内函数声明 */
 PRIVATE void init_idt_desc(unsigned char vector, u8 desc_type,
 			   int_handler handler, unsigned char privilege);
-PRIVATE void init_descriptor(DESCRIPTOR * p_desc, u32 base, u32 limit, u16 attribute);
 
 /* 中断处理函数 */
 void	divide_error();
@@ -168,6 +167,11 @@ PUBLIC void init_prot()
 	PROCESS* p_proc	= proc_table;
 	u16 selector_ldt = INDEX_LDT_FIRST << 3;
 	for (i = 0; i < NR_TASKS+NR_PROCS; i++){
+		memset(&proc_table[i], 0, sizeof(PROCESS));
+		proc_table[i].ldt_sel = SELECTOR_LDT_FIRST + (i << 3);
+		assert(INDEX_LDT_FIRST + i < GDT_SIZE);
+		//ldt和proc表中关系移动到此
+		
 		init_descriptor(&gdt[selector_ldt>>3],
 				vir2phys(seg2phys(SELECTOR_KERNEL_DS),
 					proc_table[i].ldts),
@@ -212,7 +216,7 @@ PUBLIC u32 seg2phys(u16 seg)
  *----------------------------------------------------------------------*
  初始化段描述符
  *======================================================================*/
-PRIVATE void init_descriptor(DESCRIPTOR * p_desc, u32 base, u32 limit, u16 attribute)
+PUBLIC void init_descriptor(DESCRIPTOR * p_desc, u32 base, u32 limit, u16 attribute)
 {
 	p_desc->limit_low		= limit & 0x0FFFF;		// 段界限 1		(2 字节)
 	p_desc->base_low		= base & 0x0FFFF;		// 段基址 1		(2 字节)

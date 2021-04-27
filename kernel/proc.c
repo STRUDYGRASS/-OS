@@ -206,7 +206,7 @@ PUBLIC void* va2la(int pid, void* va)
 	u32 seg_base = ldt_seg_linear(p, INDEX_LDT_RW);
 	u32 la = seg_base + (u32)va;
 
-	if (pid < NR_TASKS + NR_PROCS) { //现在是直接映射？
+	if (pid < NR_TASKS + NR_NATIVE_PROCS) { //现在是直接映射？ 对于初始化的进程而言，ldt都为0
 		assert(la == (u32)va);
 	}
 
@@ -585,7 +585,7 @@ PUBLIC void dump_proc(PROCESS* p)
 	sprintf(info, "p_flags: 0x%x.  ", p->p_flags); disp_color_str(info, text_color);
 	sprintf(info, "p_recvfrom: 0x%x.  ", p->p_recvfrom); disp_color_str(info, text_color);
 	sprintf(info, "p_sendto: 0x%x.  ", p->p_sendto); disp_color_str(info, text_color);
-	sprintf(info, "nr_tty: 0x%x.  ", p->nr_tty); disp_color_str(info, text_color);
+	// sprintf(info, "nr_tty: 0x%x.  ", p->nr_tty); disp_color_str(info, text_color);
 	disp_color_str("\n", text_color);
 	sprintf(info, "has_int_msg: 0x%x.  ", p->has_int_msg); disp_color_str(info, text_color);
 }

@@ -4,7 +4,7 @@
  * @Autor: Yunfei
  * @Date: 2021-04-18 20:20:52
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-18 20:29:01
+ * @LastEditTime: 2021-04-27 15:52:46
 ******************************************************************************/
 
 #include "head_unit.h"
@@ -22,6 +22,11 @@ PUBLIC void task_sys()
 		switch (msg.type) {
 		case GET_TICKS:
 			msg.RETVAL = ticks;
+			send_recv(SEND, src, &msg);
+			break;
+		case GET_PID:
+			msg.type = SYSCALL_RET;
+			msg.PID = src;
 			send_recv(SEND, src, &msg);
 			break;
 		default:

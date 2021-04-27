@@ -19,13 +19,17 @@ PUBLIC int kernel_main(){
 	char*		p_task_stack	= task_stack + STACK_SIZE_TOTAL;
 	u16		selector_ldt	= SELECTOR_LDT_FIRST;
 	int prio;
-	int i;
+	int i,j;
 
 	u8              privilege;
 	u8              rpl;
 	int             eflags;
 
 	for (i = 0; i < NR_TASKS + NR_PROCS; i++) {
+		if (i >= NR_TASKS + NR_NATIVE_PROCS){
+			p_proc->p_flags = FREE_SLOT;
+			continue;
+		}
 		if (i < NR_TASKS) {     /* 任务 */
                         p_task    = task_table + i;
                         privilege = PRIVILEGE_TASK;
@@ -41,25 +45,59 @@ PUBLIC int kernel_main(){
 						prio      = 5;
                 }
 		strcpy(p_proc->p_name, p_task->name);	// name of the process
-		p_proc->pid = i;			// pid
+		// p_proc->pid = i;			// pid
+		p_proc->p_parent = NO_TASK;
 
-		p_proc->ldt_sel = selector_ldt;
+		// p_proc->ldt_sel = selector_ldt; 移到protect中声明
 
-		memcpy(&p_proc->ldts[0], &gdt[SELECTOR_KERNEL_CS >> 3],
-		       sizeof(DESCRIPTOR));
-		p_proc->ldts[0].attr1 = DA_C | privilege << 5;;
-		memcpy(&p_proc->ldts[1], &gdt[SELECTOR_KERNEL_DS >> 3],
-		       sizeof(DESCRIPTOR));
-		p_proc->ldts[1].attr1 = DA_DRW | privilege << 5;
-		p_proc->regs.cs	= (0 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
-		p_proc->regs.ds	= (8 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
-		p_proc->regs.es	= (8 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
-		p_proc->regs.fs	= (8 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
-		p_proc->regs.ss	= (8 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
+		// memcpy(&p_proc->ldts[0], &gdt[SELECTOR_KERNEL_CS >> 3],
+		//        sizeof(DESCRIPTOR));
+		// p_proc->ldts[0].attr1 = DA_C | privilege << 5;;
+		// memcpy(&p_proc->ldts[1], &gdt[SELECTOR_KERNEL_DS >> 3],
+		//        sizeof(DESCRIPTOR));
+		// p_proc->ldts[1].attr1 = DA_DRW | privilege << 5;
+
+		if (strcmp(p_task->name, "INIT") != 0) {
+			p_proc->ldts[INDEX_LDT_C]  = gdt[SELECTOR_KERNEL_CS >> 3];
+			p_proc->ldts[INDEX_LDT_RW] = gdt[SELECTOR_KERNEL_DS >> 3];
+
+			/* change the DPLs */
+			p_proc->ldts[INDEX_LDT_C].attr1  = DA_C   | privilege << 5;
+			p_proc->ldts[INDEX_LDT_RW].attr1 = DA_DRW | privilege << 5;
+		}
+		else {		/* INIT process */
+			unsigned int k_base;
+			unsigned int k_limit;
+			int ret = get_kernel_map(&k_base, &k_limit);
+			assert(ret == 0);
+			init_descriptor(&p_proc->ldts[INDEX_LDT_C],
+				  0, /* bytes before the entry point
+				      * are useless (wasted) for the
+				      * INIT process, doesn'p_task matter
+				      */
+				  (k_base + k_limit) >> LIMIT_4K_SHIFT,
+				  DA_32 | DA_LIMIT_4K | DA_C | privilege << 5);
+
+			init_descriptor(&p_proc->ldts[INDEX_LDT_RW],
+				  0, /* bytes before the entry point
+				      * are useless (wasted) for the
+				      * INIT process, doesn'p_task matter
+				      */
+				  (k_base + k_limit) >> LIMIT_4K_SHIFT,
+				  DA_32 | DA_LIMIT_4K | DA_DRW | privilege << 5);
+		}
+
+		//与之前意义相同，只是这里多写了一步
+		p_proc->regs.cs = INDEX_LDT_C << 3 | SA_TIL | rpl;
+		p_proc->regs.ds = INDEX_LDT_RW << 3 | SA_TIL | rpl;
+		p_proc->regs.es = INDEX_LDT_RW << 3 | SA_TIL | rpl;
+		p_proc->regs.fs = INDEX_LDT_RW << 3 | SA_TIL | rpl;
+		p_proc->regs.ss = INDEX_LDT_RW << 3 | SA_TIL | rpl;
+
 		p_proc->regs.gs	= (SELECTOR_KERNEL_GS & SA_RPL_MASK) | rpl;
 
 		p_proc->regs.eip = (u32)p_task->initial_eip;
-		p_proc->regs.esp = (u32)p_task_stack;
+		p_proc->regs.esp = (u32)p_task_stack; //栈顶指针
 		p_proc->regs.eflags = eflags;
 
 		p_proc->p_flags = 0;
@@ -75,9 +113,11 @@ PUBLIC int kernel_main(){
 		p_task_stack -= p_task->stacksize;
 		p_proc++;
 		p_task++;
-		selector_ldt += 1 << 3;
+		// selector_ldt += 1 << 3; LDT有变动！！！
 
-		p_proc->nr_tty = 0;
+		for (j = 0; j < NR_FILES; j++)
+			p_proc->filp[j] = 0;
+
 	}
 
     k_reenter = 0;
@@ -85,9 +125,9 @@ PUBLIC int kernel_main(){
 
 	p_proc_ready	= proc_table; 
 
-	proc_table[NR_TASKS + 0].nr_tty = 0;
-	proc_table[NR_TASKS + 1].nr_tty = 1;
-	proc_table[NR_TASKS + 2].nr_tty = 1;
+	// proc_table[NR_TASKS + 0].nr_tty = 0;
+	// proc_table[NR_TASKS + 1].nr_tty = 1;
+	// proc_table[NR_TASKS + 2].nr_tty = 1;
 
 	init_clock();
 	// init_keyboard(); 放入tty中初始化
@@ -109,9 +149,7 @@ PUBLIC int get_ticks()
 	return msg.RETVAL;
 }
 
-/*======================================================================*
-                               TestA
- *======================================================================*/
+
 void TestA()
 {
 	for(;;);
@@ -154,9 +192,6 @@ void TestA()
 	spin("testa");
 }
 
-/*======================================================================*
-                               TestB
- *======================================================================*/
 void TestB()
 {
 	char tty_name[] = "/dev_tty1";
@@ -191,6 +226,40 @@ void TestC()
 		delay(1);
 	}
 }
+
+/*****************************************************************************
+ *                                Init
+ *****************************************************************************/
+/**
+ * The hen.
+ * 
+ *****************************************************************************/
+void Init()
+{
+	int fd_stdin  = open("/dev_tty0", O_RDWR);
+	assert(fd_stdin  == 0);
+	int fd_stdout = open("/dev_tty0", O_RDWR);
+	assert(fd_stdout == 1);
+
+	printf("Init() is running ...\n");
+
+	/* extract `cmd.tar' */
+	// untar("/cmd.tar");
+			
+
+	int pid = fork();
+	if (pid != 0) { /* parent process */
+		printf("parent is running, child pid:%d\n", pid);
+		spin("parent");
+	}
+	else {	/* child process */
+		printf("child is running, pid:%d\n", getpid());
+		spin("child");
+	}
+
+	assert(0);
+}
+
 
 /*****************************************************************************
  *                                panic

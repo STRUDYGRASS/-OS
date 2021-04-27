@@ -360,7 +360,16 @@ LABEL_PM_START:
 	call	GetMemInfo
 	call	SetupPaging
 
-	call	InitKernel	
+	call	InitKernel
+
+	;; fill in BootParam[]
+	mov	dword [BOOT_PARAM_ADDR], BOOT_PARAM_MAGIC ; Magic Number
+	mov	eax, [dwMemSize]
+	mov	[BOOT_PARAM_ADDR + 4], eax ; memory size
+	mov	eax, BaseOfKernelFile
+	shl	eax, 4
+	add	eax, OffsetOfKernelFile
+	mov	[BOOT_PARAM_ADDR + 8], eax ; phy-addr of kernel.bin
 
 	jmp		SelectorFlatC:KernelEntryPointPhyAddr
 ; ------------------------------------------------------------------------

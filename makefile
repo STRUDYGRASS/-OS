@@ -12,8 +12,8 @@ DASM		= ndisasm
 CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I boot/include/
-ASMKFLAGS	= -I include/ -I include/sys -f elf
-CFLAGS		= -I include/ -I include/sys -c -fno-builtin -m32  -fno-stack-protector \
+ASMKFLAGS	= -I include/ -I include/sys  -f elf
+CFLAGS		= -I include/ -I include/sys    -c -fno-builtin -m32  -fno-stack-protector \
 # # -fpack-struct  -Wno-implicit-function-declaration
 #忽略标准库冲突函数，强制不进行栈检查， \
 -fpack-struct将所有结构成员无缝隙地压缩在一起。因为它使代码程序效率大大降低，且结构成员的偏移量与系统库不相符，\
@@ -31,8 +31,11 @@ OBJS = kernel/kernel.o kernel/start.o kernel/main.o \
 		kernel/keyboard.o kernel/tty.o kernel/console.o \
 		kernel/printf.o kernel/vsprintf.o \
 		kernel/i8259.o kernel/global.o kernel/protect.o \
+		lib/getpid.o \
 		fs/main.o fs/open.o fs/read_write.o fs/link.o fs/misc.o \
 		lib/open.o lib/close.o lib/read.o lib/write.o lib/unlink.o \
+		mm/main.o mm/forkexit.o \
+		lib/fork.o lib/exit.o lib/wait.o \
 		lib/kliba.o  lib/string.o lib/klib.o lib/misc.o
 DASMOUTPUT = kernel.bin.asm
 
@@ -148,6 +151,13 @@ fs/misc.o : fs/misc.c
 fs/link.o : fs/link.c 
 	$(CC) $(CFLAGS) -o $@ $<
 
+# mm
+mm/main.o : mm/main.c 
+	$(CC) $(CFLAGS) -o $@ $<
+
+mm/forkexit.o: mm/forkexit.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 # Library
 lib/klib.o : lib/klib.c
 	$(CC)  $(CFLAGS) -o $@ $<
@@ -159,6 +169,12 @@ lib/kliba.o : lib/kliba.asm
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
 lib/misc.o: lib/misc.c
+	$(CC) $(CFLAGS) -o $@ $<	
+
+# ## 系统调用
+# getticks is in the main.c
+
+lib/getpid.o: lib/getpid.c
 	$(CC) $(CFLAGS) -o $@ $<	
 
 # ## 进程到文件系统的调用接口函数 
@@ -175,4 +191,14 @@ lib/write.o: lib/write.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 lib/unlink.o: lib/unlink.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+# ## 进程到内存系统的调用接口函数
+lib/fork.o: lib/fork.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+lib/exit.o: lib/exit.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+lib/wait.o: lib/wait.c
 	$(CC) $(CFLAGS) -o $@ $<

@@ -107,6 +107,11 @@
 /* Process */
 #define SENDING   0x02	/* set when proc trying to send */
 #define RECEIVING 0x04	/* set when proc trying to recv */
+#define WAITING   0x08	/* set when proc waiting for the child to terminate */
+#define HANGING   0x10	/* set when proc exits without being waited by parent */
+#define FREE_SLOT 0x20	/* set when proc table entry is not used
+			 * (ok to allocated to a new process)
+			 */
 
 #define	MAX_TICKS	0x7FFFABCD
 
@@ -118,7 +123,9 @@
 #define TASK_SYS	1
 #define TASK_HD		2
 #define TASK_FS		3
-/* #define TASK_MM	4 */
+#define TASK_MM		4
+#define INIT		5
+
 #define ANY		(NR_TASKS + NR_PROCS + 10)
 #define NO_TASK		(NR_TASKS + NR_PROCS + 20)
 
@@ -143,16 +150,25 @@ enum msgtype {
 	HARD_INT = 1,
 
 	/* SYS task */
-	GET_TICKS,
+	GET_TICKS,GET_PID,
 
 	/* TTY, SYS, FS, MM, etc */
 	SYSCALL_RET,
 
-	/* FS & TTY */
-	SUSPEND_PROC, RESUME_PROC,
 
 	/* FS */
 	OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK,
+
+	/* FS & TTY */
+	SUSPEND_PROC, RESUME_PROC,
+
+	/* MM */
+	EXEC, WAIT,
+
+	/* FS & MM */
+	FORK,EXIT,
+
+	
 	
 	/* message type for drivers */
 	DEV_OPEN = 1001,
@@ -177,7 +193,7 @@ enum msgtype {
 #define	WHENCE		u.m3.m3i3
 
 #define	PID		u.m3.m3i2
-/* #define	STATUS		u.m3.m3i1 */
+#define	STATUS		u.m3.m3i1
 #define	RETVAL		u.m3.m3i1
 
 

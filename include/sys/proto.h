@@ -24,8 +24,12 @@ PUBLIC void bochs_magic_break();
 /* protect.c */
 PUBLIC void	init_prot();
 PUBLIC u32	seg2phys(u16 seg);
+PUBLIC void	init_descriptor(DESCRIPTOR * p_desc,
+			  u32 base, u32 limit, u16 attribute);
 
 /* klib.c */
+PUBLIC void	get_boot_params(struct boot_params * pbp);
+PUBLIC int	get_kernel_map(unsigned int * b, unsigned int * l);
 PUBLIC void	delay(int time);
 PUBLIC void	disp_int(int input);
 PUBLIC char *	itoa(char * str, int num);
@@ -37,6 +41,7 @@ void restart();
 PUBLIC void task_sys();
 
 /* main.c */
+PUBLIC void Init();
 PUBLIC int  get_ticks();
 void TestA();
 void TestB();
@@ -75,7 +80,20 @@ PUBLIC int		do_unlink();
 PUBLIC int		do_stat();
 PUBLIC int		strip_path(char * filename, const char * pathname,
 				   struct inode** ppinode);
-PUBLIC int		search_file(char * path);;
+PUBLIC int		search_file(char * path);
+
+/* mm/main.c */
+PUBLIC void		task_mm();
+PUBLIC int		alloc_mem(int pid, int memsize);
+PUBLIC int		free_mem(int pid);
+
+/* mm/forkexit.c */
+PUBLIC int		do_fork();
+PUBLIC void		do_exit(int status);
+PUBLIC void		do_wait();
+
+/* mm/exec.c */
+PUBLIC int		do_exec();
 
 /* kernel/hd.c */
 PUBLIC void	task_hd();
@@ -94,16 +112,7 @@ PUBLIC void out_char(CONSOLE* p_con, char ch);
 PUBLIC void scroll_screen(CONSOLE* p_con, int direction);
 PUBLIC void select_console(int nr_console);
 PUBLIC void init_screen(TTY* p_tty);
-PUBLIC int  is_current_console(CONSOLE* p_con);;
-
-/* printf.c */
-PUBLIC  int     printf(const char *fmt, ...);
-// #define	printl	printf printl采用系统调用实现，printf采用文件系统实现
-PUBLIC  int     printl(const char *fmt, ...);
-
-/* vsprintf.c */
-PUBLIC  int     vsprintf(char *buf, const char *fmt, va_list args);
-PUBLIC	int	sprintf(char *buf, const char *fmt, ...);
+PUBLIC int  is_current_console(CONSOLE* p_con);
 
 /* proc.c */
 PUBLIC	void	schedule();

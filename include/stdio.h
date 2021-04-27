@@ -4,9 +4,10 @@
  * @Autor: Yunfei
  * @Date: 2021-04-23 19:40:37
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-23 19:45:34
+ * @LastEditTime: 2021-04-27 16:49:49
  */
-
+#ifndef _YUNFEI_STDIO_H
+#define _YUNFEI_STDIO_H
 /* the assert macro */
 #define ASSERT
 #ifdef ASSERT
@@ -36,6 +37,53 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 
 #define	MAX_PATH	128
 
+/**
+ * @struct stat
+ * @brief  File status, returned by syscall stat();
+ */
+struct stat {
+	int st_dev;		/* major/minor device number */
+	int st_ino;		/* i-node number */
+	int st_mode;		/* file mode, protection bits, etc. */
+	int st_rdev;		/* device ID (if special file) */
+	int st_size;		/* file size */
+};
+
+/*========================*
+ * printf, printl, printx *
+ *========================*
+ *
+ *   printf:
+ *
+ *           [send msg]                WRITE           DEV_WRITE
+ *                      USER_PROC ------------→ FS -------------→ TTY
+ *                              ↖______________↙↖_______________/
+ *           [recv msg]             SYSCALL_RET       SYSCALL_RET
+ *
+ *----------------------------------------------------------------------
+ *
+ *   printl: variant-parameter-version printx
+ *
+ *          calls vsprintf, then printx (trap into kernel directly)
+ *
+ *----------------------------------------------------------------------
+ *
+ *   printx: low level print without using IPC
+ *
+ *                       trap directly
+ *           USER_PROC -- -- -- -- -- --> KERNEL
+ *
+ *
+ *----------------------------------------------------------------------
+ */
+
+/* printf.c */
+PUBLIC  int     printf(const char *fmt, ...);
+PUBLIC  int     printl(const char *fmt, ...);
+
+/* vsprintf.c */
+PUBLIC  int     vsprintf(char *buf, const char *fmt, va_list args);
+PUBLIC	int	sprintf(char *buf, const char *fmt, ...);
 
 /*--------*/
 /* 库函数 */
@@ -58,5 +106,21 @@ PUBLIC	int	unlink		(const char *pathname);
 /* lib/getpid.c */
 PUBLIC int	getpid		();
 
-/* lib/syslog.c */
-PUBLIC	int	syslog		(const char *fmt, ...);
+/* lib/fork.c */
+PUBLIC int	fork		();
+
+/* lib/exit.c */
+PUBLIC void	exit		(int status);
+
+/* lib/wait.c */
+PUBLIC int	wait		(int * status);
+
+// /* lib/exec.c */
+// PUBLIC int	exec		(const char * path);
+// PUBLIC int	execl		(const char * path, const char *arg, ...);
+// PUBLIC int	execv		(const char * path, char * argv[]);
+
+// /* lib/stat.c */
+// PUBLIC int	stat		(const char *path, struct stat *buf);
+
+#endif

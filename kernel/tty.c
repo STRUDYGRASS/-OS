@@ -312,7 +312,8 @@ PUBLIC int sys_printx(int _unused1, int _unused2, char* s, PROCESS* p_proc)
 		if (ch == MAG_CH_PANIC || ch == MAG_CH_ASSERT)
 			continue; /* skip the magic char */
 
-		out_char(tty_table[p_proc->nr_tty].p_console, ch);
+		// out_char(tty_table[p_proc->nr_tty].p_console, ch);
+		out_char(TTY_FIRST->p_console, ch); //只用于调试情况下的打印
 	}
 
 	return 0;

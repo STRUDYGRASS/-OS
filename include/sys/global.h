@@ -49,3 +49,9 @@ EXTERN	MESSAGE			fs_msg;
 EXTERN	PROCESS *		pcaller; //调用者
 EXTERN	INODE *		root_inode;
 extern	struct dev_drv_map	dd_map[];
+
+/* MM */
+EXTERN	MESSAGE			mm_msg;
+extern	u8 *			mmbuf;
+extern	const int		MMBUF_SIZE;
+EXTERN	int			memory_size;
