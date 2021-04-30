@@ -152,79 +152,23 @@ PUBLIC int get_ticks()
 
 void TestA()
 {
-	for(;;);
-	int fd;
-	int i, n;
-
-	char filename[MAX_FILENAME_LEN+1] = "blah";
-	const char bufw[] = "abcde";
-	const int rd_bytes = 3;
-	char bufr[rd_bytes];
-
-	assert(rd_bytes <= strlen(bufw));
-
-	/* create */
-	fd = open(filename, O_CREAT | O_RDWR);
-	assert(fd != -1);
-	printl("File created: %s (fd %d)\n", filename, fd);
-
-	/* write */
-	n = write(fd, bufw, strlen(bufw));
-	assert(n == strlen(bufw));
-
-	/* close */
-	close(fd);
-
-	/* open */
-	fd = open(filename, O_RDWR);
-	assert(fd != -1);
-	printl("File opened. fd: %d\n", fd);
-
-	/* read */
-	n = read(fd, bufr, rd_bytes);
-	assert(n == rd_bytes);
-	bufr[n] = 0;
-	printl("%d bytes read: %s\n", n, bufr);
-
-	/* close */
-	close(fd);
-
-	spin("testa");
+	for(;;){
+		printf("A");
+	}
+	
 }
 
 void TestB()
 {
-	for(;;);
-	char tty_name[] = "/dev_tty1";
-
-	int fd_stdin  = open(tty_name, O_RDWR);
-	assert(fd_stdin  == 0);
-	int fd_stdout = open(tty_name, O_RDWR);
-	assert(fd_stdout == 1);
-
-	char rdbuf[128];
-
-	while (1) {
-		printf("$ ");
-		int r = read(fd_stdin, rdbuf, 70);
-		rdbuf[r] = 0;
-
-		if (strcmp(rdbuf, "hello") == 0)
-			printf("hello world!\n");
-		else
-			if (rdbuf[0])
-				printf("{%s}\n", rdbuf);
+	for(;;){
+		printf("B");
 	}
-
-	assert(0); /* never arrive here */
 }
 
 void TestC()
 {
-	while(1){
-		// disp_str("C");
-		// disp_str(".");
-		delay(1);
+	for(;;){
+		printf("C");
 	}
 }
 
@@ -320,6 +264,7 @@ void Init()
 	assert(fd_stdout == 1);
 
 	printf("Init() is running ...\n");
+	spin("1");
 
 	/* extract `cmd.tar' */
 	untar("/cmd.tar");
@@ -435,7 +380,7 @@ PUBLIC void panic(const char *fmt, ...)
 
 	i = vsprintf(buf, fmt, arg);
 
-	printl("%c !!panic!! %s", MAG_CH_PANIC, buf);
+	printf("%c !!panic!! %s", MAG_CH_PANIC, buf);
 
 	/* should never arrive here */
 	__asm__ __volatile__("ud2");

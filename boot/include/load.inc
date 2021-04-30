@@ -28,3 +28,10 @@ PageTblBase		equ	201000h	; 页表开始地址:			2M + 4K
 ;;     Macros below should corresponding with C source.
 BOOT_PARAM_ADDR		equ	0x900
 BOOT_PARAM_MAGIC	equ	0xB007
+
+;; we don't calculate the base sector nr of the root device while loading
+;; but define it as a macro for two reasons:
+;; 1. it is a constant for any certain system
+;; 2. it simplifies boot sector and loader
+ROOT_BASE		equ	0x5800 
+;superbclock前的偏移

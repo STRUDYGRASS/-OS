@@ -11,7 +11,7 @@ ASMFLAGS	= -I ../include/ -f elf
 CFLAGS		= -I ../include/ -c -fno-builtin -fno-stack-protector -m32 -Wall 
 LDFLAGS		=  -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS	= -D
-LIB		= ../lib/yunfeios.a
+LIB		= ../lib/yunfeiOScrt.a
 BIN		= echo pwd
 
 # All Phony Targets
