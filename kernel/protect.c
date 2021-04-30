@@ -168,6 +168,7 @@ PUBLIC void init_prot()
 	u16 selector_ldt = INDEX_LDT_FIRST << 3;
 	for (i = 0; i < NR_TASKS+NR_PROCS; i++){
 		memset(&proc_table[i], 0, sizeof(PROCESS));
+		
 		proc_table[i].ldt_sel = SELECTOR_LDT_FIRST + (i << 3);
 		assert(INDEX_LDT_FIRST + i < GDT_SIZE);
 		//ldt和proc表中关系移动到此

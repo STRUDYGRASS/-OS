@@ -17,7 +17,7 @@ BaseOfStack     equ     07c00h
     jmp short LABEL_START
     nop     ;不知道为何必不可少（？）
 
-%include "fat12hdr.inc" ;包含一些磁盘信息
+%include "fat12hdr.inc" ;包含一些磁盘信息,加入以便于系统识别
 
 LABEL_START:
     mov ax, cs

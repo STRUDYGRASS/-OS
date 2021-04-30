@@ -8,7 +8,6 @@
  ;***
 %include "sconst.inc"
 
-SELECTOR_KERNEL_CS	equ	8
 
 ; 导入函数
 extern	cstart

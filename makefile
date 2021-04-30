@@ -21,6 +21,7 @@ CFLAGS		= -I include/ -I include/sys    -c -fno-builtin -m32  -fno-stack-protect
 忽略函数定义未找到警告（asm中）
 LDFLAGS		= -s -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
+ARFLAGS		= rcs
 
 # This Program
 OSBOOT = boot/boot.bin boot/loader.bin
@@ -33,9 +34,9 @@ OBJS = kernel/kernel.o kernel/start.o kernel/main.o \
 		kernel/i8259.o kernel/global.o kernel/protect.o \
 		lib/getpid.o \
 		fs/main.o fs/open.o fs/read_write.o fs/link.o fs/misc.o \
-		lib/open.o lib/close.o lib/read.o lib/write.o lib/unlink.o \
-		mm/main.o mm/forkexit.o \
-		lib/fork.o lib/exit.o lib/wait.o \
+		lib/open.o lib/close.o lib/read.o lib/write.o lib/unlink.o lib/stat.o \
+		mm/main.o mm/forkexit.o mm/exec.o \
+		lib/fork.o lib/exit.o lib/wait.o lib/exec.o \
 		lib/kliba.o  lib/string.o lib/klib.o lib/misc.o
 DASMOUTPUT = kernel.bin.asm
 
@@ -51,6 +52,8 @@ DASMOUTPUT = kernel.bin.asm
 nop :
 	@echo "why not \`make image' huh? :)"
 everything: $(OSBOOT) $(OSKERNEL)
+
+
 
 all: realclean everything
 
@@ -158,6 +161,9 @@ mm/main.o : mm/main.c
 mm/forkexit.o: mm/forkexit.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+mm/exec.o: mm/exec.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 # Library
 lib/klib.o : lib/klib.c
 	$(CC)  $(CFLAGS) -o $@ $<
@@ -193,6 +199,9 @@ lib/write.o: lib/write.c
 lib/unlink.o: lib/unlink.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+lib/stat.o: lib/stat.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 # ## 进程到内存系统的调用接口函数
 lib/fork.o: lib/fork.c
 	$(CC) $(CFLAGS) -o $@ $<
@@ -201,4 +210,7 @@ lib/exit.o: lib/exit.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 lib/wait.o: lib/wait.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+lib/exec.o: lib/exec.c
 	$(CC) $(CFLAGS) -o $@ $<

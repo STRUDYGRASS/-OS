@@ -1,4 +1,3 @@
-#include "type.h"
 #include "config.h"
 #include "stdio.h"
 #include "const.h"

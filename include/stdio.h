@@ -4,10 +4,14 @@
  * @Autor: Yunfei
  * @Date: 2021-04-23 19:40:37
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-27 16:49:49
+ * @LastEditTime: 2021-04-30 14:54:04
  */
 #ifndef _YUNFEI_STDIO_H
 #define _YUNFEI_STDIO_H
+
+#include "type.h"
+
+
 /* the assert macro */
 #define ASSERT
 #ifdef ASSERT
@@ -115,12 +119,12 @@ PUBLIC void	exit		(int status);
 /* lib/wait.c */
 PUBLIC int	wait		(int * status);
 
-// /* lib/exec.c */
-// PUBLIC int	exec		(const char * path);
-// PUBLIC int	execl		(const char * path, const char *arg, ...);
-// PUBLIC int	execv		(const char * path, char * argv[]);
+/* lib/exec.c */
+PUBLIC int	exec		(const char * path);
+PUBLIC int	execl		(const char * path, const char *arg, ...);
+PUBLIC int	execv		(const char * path, char * argv[]);
 
-// /* lib/stat.c */
-// PUBLIC int	stat		(const char *path, struct stat *buf);
+/* lib/stat.c */
+PUBLIC int	stat		(const char *path, struct stat *buf);
 
 #endif
