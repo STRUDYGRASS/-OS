@@ -4,7 +4,7 @@
  * @Autor: Yunfei
  * @Date: 2021-04-27 14:52:24
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-27 14:52:37
+ * @LastEditTime: 2021-05-08 02:00:53
 ******************************************************************************/
 
 #include "head_unit.h"
@@ -36,9 +36,9 @@ PUBLIC void task_mm()
 			do_exit(mm_msg.STATUS);
 			reply = 0;
 			break;
-		// case EXEC:
-		// 	mm_msg.RETVAL = do_exec();
-		// 	break;
+		case EXEC:
+			mm_msg.RETVAL = do_exec();
+			break;
 		case WAIT:
 			do_wait();
 			reply = 0;
@@ -50,6 +50,7 @@ PUBLIC void task_mm()
 		}
 
 		if (reply) {
+
 			mm_msg.type = SYSCALL_RET;
 			send_recv(SEND, src, &mm_msg);
 		}

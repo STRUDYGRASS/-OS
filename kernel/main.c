@@ -25,7 +25,7 @@ PUBLIC int kernel_main(){
 	u8              rpl;
 	int             eflags;
 
-	for (i = 0; i < NR_TASKS + NR_PROCS; i++) {
+	for (i = 0; i < NR_TASKS + NR_PROCS; i++,p_proc++,p_task++) {
 		if (i >= NR_TASKS + NR_NATIVE_PROCS){
 			p_proc->p_flags = FREE_SLOT;
 			continue;
@@ -111,8 +111,6 @@ PUBLIC int kernel_main(){
 		p_proc->ticks = p_proc->priority = prio;
 
 		p_task_stack -= p_task->stacksize;
-		p_proc++;
-		p_task++;
 		// selector_ldt += 1 << 3; LDT有变动！！！
 
 		for (j = 0; j < NR_FILES; j++)
@@ -208,7 +206,6 @@ void untar(const char * filename)
 
 	char buf[SECTOR_SIZE * 16];
 	int chunk = sizeof(buf);
-	debug_couont++;
 
 	while (1) {
 		read(fd, buf, SECTOR_SIZE);
