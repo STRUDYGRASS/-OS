@@ -72,7 +72,6 @@ PUBLIC int do_rdwt()
 
 		int off = pos % SECTOR_SIZE;
 		int rw_sect_min=pin->i_start_sect+(pos>>SECTOR_SIZE_SHIFT);
-		printf("the start sect: %d",rw_sect_min);
 		int rw_sect_max=pin->i_start_sect+(pos_end>>SECTOR_SIZE_SHIFT);
 
 		int chunk = min(rw_sect_max - rw_sect_min + 1,
@@ -91,6 +90,7 @@ PUBLIC int do_rdwt()
 				  TASK_FS,
 				  fsbuf);
 
+			//此处读取磁盘中文件
 			if (fs_msg.type == READ) {
 				phys_copy((void*)va2la(src, buf + bytes_rw),
 					  (void*)va2la(TASK_FS, fsbuf + off),

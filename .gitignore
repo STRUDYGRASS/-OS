@@ -8,6 +8,8 @@ bochsrc
 
 # midlle product
 *.o
+*.a 
+*.tar
 
 # the last product
 *.bin

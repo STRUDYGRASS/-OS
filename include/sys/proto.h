@@ -41,6 +41,7 @@ void restart();
 PUBLIC void task_sys();
 
 /* main.c */
+void shabby_shell(const char * tty_name);
 PUBLIC void Init();
 PUBLIC int  get_ticks();
 void TestA();

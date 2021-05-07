@@ -25,7 +25,7 @@ PRIVATE void new_dir_entry(INODE * dir_inode, int inode_nr, char * filename);
 /**
  * Open a file and return the file descriptor.
  * 
- * @return File descriptor if successful, otherwise a negative error code.
+ * @return File descriptor if successful, otherwise a negative .
  *****************************************************************************/
 PUBLIC int do_open()
 {
@@ -91,7 +91,7 @@ PUBLIC int do_open()
 		f_desc_table[i].fd_inode = pin;
 
 		f_desc_table[i].fd_mode = flags;
-		/* f_desc_table[i].fd_cnt = 1; */
+		f_desc_table[i].fd_cnt = 1;
 		f_desc_table[i].fd_pos = 0;
 
 		int imode = pin->i_mode & I_TYPE_MASK;
@@ -167,7 +167,8 @@ PUBLIC int do_close()
 {
 	int fd = fs_msg.FD;
 	put_inode(pcaller->filp[fd]->fd_inode);
-	pcaller->filp[fd]->fd_inode = 0;
+	if (--pcaller->filp[fd]->fd_cnt == 0)
+		pcaller->filp[fd]->fd_inode = 0;
 	pcaller->filp[fd] = 0;
 
 	return 0;

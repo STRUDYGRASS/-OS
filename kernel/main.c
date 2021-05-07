@@ -45,7 +45,7 @@ PUBLIC int kernel_main(){
 						prio      = 5;
                 }
 		strcpy(p_proc->p_name, p_task->name);	// name of the process
-		// p_proc->pid = i;			// pid
+		p_proc->pid = i;			// pid
 		p_proc->p_parent = NO_TASK;
 
 		// p_proc->ldt_sel = selector_ldt; 移到protect中声明
@@ -123,6 +123,8 @@ PUBLIC int kernel_main(){
     k_reenter = 0;
 	ticks = 0;
 
+	debug_couont = 0;
+
 	p_proc_ready	= proc_table; 
 
 	// proc_table[NR_TASKS + 0].nr_tty = 0;
@@ -152,24 +154,18 @@ PUBLIC int get_ticks()
 
 void TestA()
 {
-	for(;;){
-		printf("A");
-	}
+	for(;;);
 	
 }
 
 void TestB()
 {
-	for(;;){
-		printf("B");
-	}
+	for(;;);
 }
 
 void TestC()
 {
-	for(;;){
-		printf("C");
-	}
+	for(;;);
 }
 
 /**
@@ -212,6 +208,7 @@ void untar(const char * filename)
 
 	char buf[SECTOR_SIZE * 16];
 	int chunk = sizeof(buf);
+	debug_couont++;
 
 	while (1) {
 		read(fd, buf, SECTOR_SIZE);
@@ -264,7 +261,6 @@ void Init()
 	assert(fd_stdout == 1);
 
 	printf("Init() is running ...\n");
-	spin("1");
 
 	/* extract `cmd.tar' */
 	untar("/cmd.tar");
@@ -282,6 +278,7 @@ void Init()
 			printf("[child is running, pid:%d]\n", getpid());
 			close(fd_stdin);
 			close(fd_stdout);
+
 			
 			shabby_shell(tty_list[i]);
 			assert(0);

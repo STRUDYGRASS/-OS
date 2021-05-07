@@ -4,7 +4,7 @@
  * @Autor: Yunfei
  * @Date: 2021-04-19 18:49:33
  * @LastEditors: Yunfei
- * @LastEditTime: 2021-04-30 18:26:04
+ * @LastEditTime: 2021-05-08 01:29:00
 ******************************************************************************/
 #include "head_unit.h"
 
@@ -127,7 +127,7 @@ PRIVATE void hd_open(int device)
 
 	if (hd_info[drive].open_cnt++ == 0) {
 		partition(drive * (NR_PART_PER_DRIVE + 1), P_PRIMARY);
-		print_hdinfo(&hd_info[drive]);
+		// print_hdinfo(&hd_info[drive]);
 	}
 }
 /*****************************************************************************

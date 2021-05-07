@@ -98,7 +98,6 @@ csinit:		; “这个跳转指令强制使用刚刚初始化的结构”——<<O
 	xor eax, eax
 	mov ax, SELECTOR_TSS
 	ltr ax
-	xchg bx,bx
 
 	jmp kernel_main
 
