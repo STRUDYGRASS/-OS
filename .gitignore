@@ -1,10 +1,8 @@
 # vscode config file 
 .vscode/
 
-# shell and image
+# image
 *.img
-*.sh
-bochsrc
 
 # midlle product
 *.o
