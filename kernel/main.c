@@ -153,6 +153,63 @@ PUBLIC int get_ticks()
 void TestA()
 {
 	for(;;);
+	int fd;
+	int i, n;
+
+	char filename[MAX_FILENAME_LEN+1] = "test_file";
+	const char bufw[] = "test_input";
+	const int rd_bytes = 4;
+	char bufr[rd_bytes];
+
+	assert(rd_bytes <= strlen(bufw));
+
+	/* create */
+	fd = open(filename, O_CREAT | O_RDWR);
+	assert(fd != -1);
+	printl("File created: %s (fd %d)\n", filename, fd);
+
+	/* write */
+	n = write(fd, bufw, strlen(bufw));
+	assert(n == strlen(bufw));
+
+	/* close */
+	close(fd);
+
+	/* open */
+	fd = open(filename, O_RDWR);
+	assert(fd != -1);
+	printl("File opened. fd: %d\n", fd);
+
+	/* read */
+	n = read(fd, bufr, rd_bytes);
+	assert(n == rd_bytes);
+	bufr[n] = 0;
+	printl("%d bytes read: %s\n", n, bufr);
+
+	/* close */
+	close(fd);
+
+	char * filenames[] = {"/foo", "/bar", "/baz"};
+
+	/* create files */
+	for (i = 0; i < sizeof(filenames) / sizeof(filenames[0]); i++) {
+		fd = open(filenames[i], O_CREAT | O_RDWR);
+		assert(fd != -1);
+		printl("File created: %s (fd %d)\n", filenames[i], fd);
+		close(fd);
+	}
+
+	char * rfilenames[] = {"/bar", "/foo", "/baz", "/dev_tty0"};
+
+	/* remove files */
+	for (i = 0; i < sizeof(rfilenames) / sizeof(rfilenames[0]); i++) {
+		if (unlink(rfilenames[i]) == 0)
+			printl("File removed: %s\n", rfilenames[i]);
+		else
+			printl("Failed to remove file: %s\n", rfilenames[i]);
+	}
+
+	spin("TestA");
 	
 }
 
@@ -338,7 +395,8 @@ void shabby_shell(const char * tty_name)
 		if (fd == -1) {
 			if (rdbuf[0]) {
 				write(1, "{", 1);
-				write(1, rdbuf, r);
+				// write(1, rdbuf, r);
+				write(1,"unknow command",15);
 				write(1, "}\n", 2);
 			}
 		}
